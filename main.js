@@ -12,7 +12,7 @@ async function readFile(dir) {
     const file = await fs.readFile(resolvePath(dir, filePath), 'utf8')
     const fileAlias = filePath.replace('.md', '.html')
     let res = md.render(file)
-    await fs.writeFile(resolvePath('pages', fileAlias), res)
+    await fs.writeFile(resolvePath('docs', fileAlias), res)
   }
 }
-readFile('docs')
+readFile('pages')
