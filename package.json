@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node ./main.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Stan-BK/blog-resource/issues"
   },
-  "homepage": "https://github.com/Stan-BK/blog-resource#readme"
+  "homepage": "https://github.com/Stan-BK/blog-resource#readme",
+  "devDependencies": {
+    "markdown-it": "^13.0.1"
+  }
 }
