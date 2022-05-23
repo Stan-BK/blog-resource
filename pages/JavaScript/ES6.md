@@ -5,10 +5,10 @@
 let语法的规则有：
 
 1. 在同一作用域下，不允许重复声明。
-1. let不会提升，会产生一个暂时性死区。例：
+2. let不会提升，会产生一个暂时性死区。例：
 ```javascript
 {
-	console.log(a); //输出undefined
+  console.log(a); //输出undefined
   var a = 10;
 }
 {
@@ -16,15 +16,15 @@ let语法的规则有：
   let a = 10;
 }
 {
-	console.log(typeof a); //报错，暂时性死区
-	let a;
+  console.log(typeof a); //报错，暂时性死区
+  let a;
 }
 ```
 
 3. let只能在当前的块级作用域下生效。例：
 ```javascript
 {
-	let a = 1
+  let a = 1
   console.log(a) //输出1
 }
 console.log(a) //报错
@@ -115,27 +115,27 @@ console.log(son1)
 如果对象中的属性键名和值变量名相同的话，可以进行简写，例：
 ```javascript
 var name = 'try',
-		age = 21
+    age = 21
 var obj = {
-	name: name,
+  name: name,
   age: age
 }
 //可简写为
 var obj = {
-	name,
+  name,
   age
 }
 
 属性名还可以通过以下方式拼接：
 var lastName = 'b'
 var obj = {
-	['a' + lastName] : 1 //即'ab': 1
+  ['a' + lastName] : 1 //即'ab': 1
 }
 ```
 对象中的方法的简写：
 ```javascript
 var obj = {
-	test: function() {}
+  test: function() {}
   //可以简写为
   test() {}
  }
@@ -191,8 +191,7 @@ test() //输出3
 var func = a => 1
 console.log(func()) //输出1
 ```
-# 
- 9、...（rest/spread运算符）收集剩余参数/展开参数
+# 9、...（rest/spread运算符）收集剩余参数/展开参数
 ...(rest/spread)运算符允许我们将一个不定数量的参数表示为一个数组。rest运算符可以将一个数组进行收集，spread运算符可以将数组进行展开，例：
 ```javascript
 //收集
@@ -467,8 +466,8 @@ Proxy 对象用于创建一个对象的代理，从而实现基本操作的拦�
 var host = { name: 'star', age: 21 }
 var handler = {
   //获取host属性时的拦截
-	get: function(target, key) {
-  	if (key === 'age') {
+  get: function(target, key) {
+    if (key === 'age') {
       return 20
     }
     return target[key]
@@ -545,12 +544,12 @@ class Example {
 ```javascript
 //class中指向父类
 class Parent {
-	say() {
+  say() {
     console.log("parent's function")
   }
 }
 class Children extends Parent {
-	constructor(lastName) {
+  constructor(lastName) {
     super().say()
     this.age = 21
   }
@@ -568,7 +567,7 @@ var pro = {
 var obj = {
   //只能在ES6的简写方法中可以调用super
   trySay() {
-  	super.say() //pro's function
+    super.say() //pro's function
     console.log(super.name) //pro
   }
 }
@@ -580,11 +579,11 @@ obj.trySay()
 new本身是从构造函数生成实例对象的命令。在ES6中，new命令引入了target属性，该属性一般用在构造函数中，返回new命令作用于的构造函数，如果不是该构造函数不是通过new命令或Reflect.construct()调用,则new.target会返回undefined，因此可以利用该属性用来确定构造函数的调用方式。new.target只能在函数内部使用，且在子类继承父类时，new.target会返回子类。
 ```html
 class Parent {
- constructor() {
-   if (new.target === Parent) {
+  constructor() {
+    if (new.target === Parent) {
      throw new Error('本类不能被实例化')
-   }
- }
+    }
+  }
 }
 
 var person = new Parent() //报错
@@ -732,7 +731,7 @@ pro.then(data => {
 }).catch(err => {
   console.log(err)
 })
-         
+
 //输出
 ok
 ```

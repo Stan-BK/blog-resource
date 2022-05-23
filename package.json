@@ -19,5 +19,10 @@
   "homepage": "https://github.com/Stan-BK/blog-resource#readme",
   "devDependencies": {
     "markdown-it": "^13.0.1"
+  },
+  "dependencies": {
+    "markdown-it-anchor": "^8.6.4",
+    "markdown-it-highlightjs": "^4.0.1",
+    "string": "^3.3.3"
   }
 }
