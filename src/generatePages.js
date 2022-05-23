@@ -3,9 +3,8 @@ const fs = require('fs').promises
 const path = require('path')
 const resolvePath = (...args) => path.resolve(__dirname, ...args)
 const md = new MarkdownIt()
-const string = require('string')
 const legacySlugify = s => {
-  return string(s).slugify().toString()
+  return s.replace(/\d(.)?/, '')
 }
 
 md.use(require('markdown-it-highlightjs'), { inline: true })
