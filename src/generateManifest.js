@@ -4,12 +4,13 @@ const resolvePath = (...args) => path.resolve(__dirname, ...args)
 
 async function generateManifest() {
   let pageInfo = await fs.readFile(resolvePath('../docs', 'manifest.json'), 'utf-8')
-  let dialogs = [] // 记录存在的分类
   pageInfo = JSON.parse(pageInfo)
+  let dialogCache = [] // 记录存在的分类
 
-  const dialog = await fs.readdir(resolvePath('../pages'))
-  for (const dialogname of dialog) {
-    dialogs.push(dialogname)
+  const dialogs = await fs.readdir(resolvePath('../pages'))
+  for (const dialogname of dialogs) {
+    console.log(dialogname)
+    dialogCache.push(dialogname)
     if (!pageInfo[dialogname]) {
       pageInfo[dialogname] = {}
     }
@@ -19,8 +20,9 @@ async function generateManifest() {
   }
 
   for (const key of Object.keys(pageInfo)) {
-    if (!dialogs.includes(key)) {
+    if (!dialogCache.includes(key)) {
       delete pageInfo[key]
+      await fs.rmdir(resolvePath('../docs', key), { recursive: true })
     }
   }
   await fs.writeFile(resolvePath('../docs', 'manifest.json'), JSON.stringify(pageInfo, undefined, 2))
