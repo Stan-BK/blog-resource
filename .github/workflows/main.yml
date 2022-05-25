@@ -25,6 +25,5 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Generate pages
-        run: |
-              npm i
-              node ./main.js
+        run:  npm i
+        run:  node ./main.js
