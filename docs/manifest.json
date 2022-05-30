@@ -1,8 +1,8 @@
 {
-  "javascript": {
+  "html": {
     "sum": 1,
     "pages": [
-      "ES6.html"
+      "DOM.html"
     ]
   }
 }
