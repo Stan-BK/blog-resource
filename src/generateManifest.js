@@ -9,7 +9,6 @@ async function generateManifest() {
 
   const dialogs = await fs.readdir(resolvePath('../pages'))
   for (const dialogname of dialogs) {
-    console.log(dialogname)
     dialogCache.push(dialogname)
     if (!pageInfo[dialogname]) {
       pageInfo[dialogname] = {}

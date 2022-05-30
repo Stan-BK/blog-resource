@@ -2,15 +2,11 @@ const MarkdownIt = require('markdown-it')
 const fs = require('fs').promises
 const path = require('path')
 const resolvePath = (...args) => path.resolve(__dirname, ...args)
-const md = new MarkdownIt()
-const legacySlugify = s => {
-  return s.replace(/\d(.)?/, '')
-}
 
+const md = new MarkdownIt()
 md.use(require('markdown-it-highlightjs'), { inline: true })
-md.use(require('markdown-it-anchor'), {
-  slugify: legacySlugify
-})
+md.use(require('markdown-it-anchor'))
+md.use(require('markdown-it-toc-done-right'))
 
 let template
 
