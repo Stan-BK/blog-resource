@@ -1,8 +1,35 @@
 {
-  "html": {
+  "CSS": {
     "sum": 1,
     "pages": [
-      "DOM.html"
+      "CSS.html"
+    ]
+  },
+  "HTML": {
+    "sum": 4,
+    "pages": [
+      "Canvas基本API.html",
+      "Canvas探究.html",
+      "DOM.html",
+      "DOM事件.html"
+    ]
+  },
+  "JavaScript": {
+    "sum": 7,
+    "pages": [
+      "原型、原型链、call和apply、判断数据类型的三种方法（constructor、instanceof、Object.prototype.toString.call()）、圣杯模式、callee和caller.html",
+      "对象、包装类、对象克隆、深拷贝和浅拷贝、this例题.html",
+      "数组、类数组、数组去重、数组扁平化.html",
+      "数组拓展方法.html",
+      "运算细节、循环、类型转换.html",
+      "错误信息、try..catch、严格模式.html",
+      "预编译、作用域、闭包.html"
+    ]
+  },
+  "TypeScript": {
+    "sum": 1,
+    "pages": [
+      "TypeScript.html"
     ]
   }
 }

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <p>ES5的数组拓展方法只会遍历有值的索引。</p>
+<h1 id="1%E3%80%81foreach%EF%BC%88es5%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">1、forEach（ES5新增）</h1>
+<p>forEach是在Array.prototype上的方法，为ES5的拓展方法。forEach没有返回值。
+数组使用forEach每遍历一次都会执行一个回调函数（即forEach函数的第一个参数为回调函数），该函数接收三个参数：（elem，index，array），分别是元素本身，元素下标，数组本身，如果elem为引用值，则对elem的修改会影响到原数组中的元素。
+在forEach（）的回调函数中，this默认指向window。
+forEach（）的第二个参数是更改回调函数中的this指向，要求接收一个对象，如果实参为原始值，会将其强制转换成引用值，null和undefined无效。
+重写forEach函数解决兼容性：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myForEach</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>] || <span class="hljs-variable language_">window</span>
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    fn.<span class="hljs-title function_">apply</span>(arg2, [arr[i], i, arr])
+  }
+}
+</code></pre>
+<p>tips：forEach不会遍历空数组或稀松数组的空项，且break和continue关键字无效。</p>
+<h1 id="2%E3%80%81filter%EF%BC%88es5%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">2、filter（ES5新增）</h1>
+<p>filter是在Array.prototype上的方法，为ES5的拓展方法，用于筛选数组元素。
+filter的第一个参数是回调函数，每遍历一个元素都会执行回调函数，该回调函数接收三个参数：（elem，index，array），回调函数的返回值为布尔值，如果布尔值为真，则该元素保留，filter（）的执行结果会返回所有保留元素的数组集合，如果elem为引用值，则对elem的修改会影响到原数组中的元素。
+filter的第二个参数是更改回调函数中的this指向，要求接收一个对象，如果实参为原始值，会将其强制转换成引用值，null和undefined无效。
+重写filter函数解决兼容性：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFilter</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>] || <span class="hljs-variable language_">window</span>,
+      newArr = []
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    item = <span class="hljs-title function_">deepClone</span>(arr[i])<span class="hljs-comment">//进行深拷贝</span>
+    fn.<span class="hljs-title function_">apply</span>(arg2, [arr[i], i, arr]) ? newArr.<span class="hljs-title function_">push</span>(item) : <span class="hljs-string">&#x27;&#x27;</span>
+  }
+
+  <span class="hljs-keyword">return</span> newArr
+}
+</code></pre>
+<h1 id="3%E3%80%81map%EF%BC%88es5%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">3、map（ES5新增）</h1>
+<p>map是在Array.prototype上的方法，为ES5的拓展方法。
+map的第一个参数是回调函数，每遍历一个元素都会执行回调函数，该回调函数接收三个参数：（elem，index，array），如果elem为引用值，则对elem的修改会影响到原数组中的元素，map（）的执行结果会返回所有回调函数返回结果的数组集合。
+map的第二个参数是更改回调函数中的this指向，要求接收一个对象，如果实参为原始值，会将其强制转换成引用值，null和undefined无效。
+重写map函数解决兼容性：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myMap</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>] || <span class="hljs-variable language_">window</span>,
+      newArr = [],
+      item
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    item = <span class="hljs-title function_">deepClone</span>(arr[i])<span class="hljs-comment">//深拷贝，解决elem为引用值时会影响到原数组的问题</span>
+    newArr.<span class="hljs-title function_">push</span>(fn.<span class="hljs-title function_">apply</span>(arg2, [item, i, arr]))
+  }
+
+  <span class="hljs-keyword">return</span> newArr
+}
+</code></pre>
+<h1 id="4%E3%80%81every%E5%92%8Csome%EF%BC%88es5%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">4、every和some（ES5新增）</h1>
+<p>every和some是在Array.prototype上的方法，为ES5的拓展方法。
+every和some的第一个参数是回调函数，每遍历一个元素都会执行回调函数，该回调函数接收三个参数：（elem，index，array），如果elem为引用值，则对elem的修改会影响到原数组中的元素。
+every在遍历的过程中，如果有一个不满足条件就停止遍历，条件就是return 后面的表达式。
+some在遍历的过程中，如果有一个满足条件就停止遍历，条件就是return 后面的表达式。
+两者都会返回一个布尔值。
+every和some的第二个参数是更改回调函数中的this指向，要求接收一个对象，如果实参为原始值，会将其强制转换成引用值，null和undefined无效。
+重写every函数解决兼容性：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myEvery</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>] || <span class="hljs-variable language_">window</span>,
+      istrue = <span class="hljs-literal">true</span>
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    istrue = fn.<span class="hljs-title function_">apply</span>(arg2, [arr[i], i, arr])
+    <span class="hljs-keyword">if</span> (istrue === <span class="hljs-literal">false</span>) {
+      <span class="hljs-keyword">break</span>
+    }
+  }
+
+  <span class="hljs-keyword">return</span> istrue
+}
+</code></pre>
+<p>重写some函数解决兼容性：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">mySome</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>] || <span class="hljs-variable language_">window</span>,
+      istrue = <span class="hljs-literal">false</span>
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    istrue = fn.<span class="hljs-title function_">apply</span>(arg2, [arr[i], i, arr])
+    <span class="hljs-keyword">if</span> (istrue === <span class="hljs-literal">true</span>) {
+      <span class="hljs-keyword">break</span>
+    }
+  }
+
+  <span class="hljs-keyword">return</span> istrue
+}
+</code></pre>
+<h1 id="5%E3%80%81reduce%E5%92%8Creduceright%EF%BC%88es5%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">5、reduce和reduceRight（ES5新增）</h1>
+<p>reduce（归纳函数）是在Array.prototype上的方法，为ES5的拓展方法。
+reduce的第一个参数是回调函数，每遍历一个元素都会执行回调函数，该回调函数接收三个参数：（prev，elem，index，array），如果elem为引用值，则对elem的修改会影响到原数组中的元素。回调函数的返回值会作为下一次执行的回调函数的prev值。
+第二个参数是作为第一次调用回调函数时prev的初始值。
+reduceRight和reduce的区别在于遍历的顺序相反。
+重写reduce函数解决兼容性：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myReduce</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>]
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    arg2 = <span class="hljs-title function_">fn</span>(arg2, arr[i], i, arr)
+  }
+
+  <span class="hljs-keyword">return</span> arg2
+}
+</code></pre>
+<p>重写reduceRight函数解决兼容性：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myReduceRight</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>]
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = len - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--) {
+    arg2 = <span class="hljs-title function_">fn</span>(arg2, arr[i], i, arr)
+  }
+
+  <span class="hljs-keyword">return</span> arg2
+}
+</code></pre>
+<h1 id="6%E3%80%81copywithin%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">6、copyWithin（ES6新增）</h1>
+<p>copyWithin是Array.prototype上的方法，为ES6上的拓展方法。返回值是原数组引用。
+copyWithin(target, start, end)
+copyWithin的第一个参数是序列将复制到的位置。如果target 大于等于 arr.length，将会不发生拷贝。如果 target 在 start 之后，复制的序列将被修改以符合 arr.length。
+copyWithin的第二个参数和第三个参数为一个左闭右开的区间。分别表示复制元素的起始位和结束位。
+如果只有第一个参数，则会取整个数组为复制的副本，然后从第一个参数起的下标元素开始替换。
+如果只有第一和第二个参数，则会取[第二个参数, arr.length)为复制的副本，从第一个参数起的下标元素开始替换，超出数组长度部分忽略。
+tips：copyWithin不会改变数组长度。如果复制的是引用值，采取的是浅拷贝方式。copyWithin 函数被设计为通用式的，其不要求其 this 值必须是一个数组对象。
+实现copyWithin：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myCopyWithin</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">target, start, end</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span> == <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&#x27;this is null or not defined&#x27;</span>)
+  }
+
+  <span class="hljs-keyword">var</span> obj = <span class="hljs-title class_">Object</span>(<span class="hljs-variable language_">this</span>),
+      len = obj.<span class="hljs-property">length</span> &gt;&gt;&gt; <span class="hljs-number">0</span>,
+      dir = <span class="hljs-number">1</span>
+      
+  <span class="hljs-keyword">var</span> target = target &gt;&gt; <span class="hljs-number">0</span>
+  target = target &lt; <span class="hljs-number">0</span> ? <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(target + len, <span class="hljs-number">0</span>)
+                      : <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(target, len) 
+
+  <span class="hljs-keyword">var</span> start = start &gt;&gt; <span class="hljs-number">0</span>
+ 	start = start &lt; <span class="hljs-number">0</span> ? <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(start + len, <span class="hljs-number">0</span>)
+                    : <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(start, len) 
+
+  <span class="hljs-keyword">var</span> end = end &gt;&gt; <span class="hljs-number">0</span>
+  end = end &lt; <span class="hljs-number">0</span> ? <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(end + len, <span class="hljs-number">0</span>)
+                : <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(end, len) 
+
+  <span class="hljs-keyword">var</span> count = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(end - start, len - target)
+
+  <span class="hljs-keyword">if</span> (start &lt; target &amp;&amp; target &lt; (start + count)) {
+    dir = -<span class="hljs-number">1</span>
+    start += count - <span class="hljs-number">1</span>
+    target += count - <span class="hljs-number">1</span>
+  }
+
+  <span class="hljs-keyword">while</span> (count) {
+    <span class="hljs-keyword">if</span> (start <span class="hljs-keyword">in</span> obj) {
+      obj[target] = obj[start]
+    } <span class="hljs-keyword">else</span> {
+			<span class="hljs-keyword">delete</span> obj[target]
+    }
+
+    start += dir
+    target += dir
+    count--
+  }
+
+  <span class="hljs-keyword">return</span> obj
+}
+</code></pre>
+<h1 id="7%E3%80%81fill%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">7、fill（ES6新增）</h1>
+<p>fill()是Array原型下的方法，fill会将所有元素改为默认值（第一个参数）。
+如果没有参数，则会将用undefined把所以元素覆盖。
+如果有第二个参数，则会将该参数下标及往后元素都改为默认值。
+如果有第三个参数，则会把第二个参数和第三个参数作为左闭右开区间，将该区间内的元素改为默认值。
+tips：当第二个参数和第三个参数为非数字时，不会进行覆盖。当第二个参数为非数字、第三个参数为数字时，区间为[0, 第三个参数)。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr2 = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">of</span>(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr2.<span class="hljs-title function_">fill</span>(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>)) <span class="hljs-comment">// [3, 1, 1, 6]</span>
+</code></pre>
+<p>实现fill：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFill</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">value, start, end</span>) {
+  <span class="hljs-keyword">var</span> value = value || <span class="hljs-literal">undefined</span>,
+      start = start &gt;&gt; <span class="hljs-number">0</span>
+  
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span> == <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&#x27;This is null of not defined&#x27;</span>)
+  }
+
+  <span class="hljs-keyword">var</span> obj = <span class="hljs-title class_">Object</span>(<span class="hljs-variable language_">this</span>),
+      len = obj.<span class="hljs-property">length</span> &gt;&gt;&gt; <span class="hljs-number">0</span>
+
+  start = start &lt; <span class="hljs-number">0</span> ?
+        <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(start + len, <span class="hljs-number">0</span>) :
+        <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(start, len)
+          
+
+  end = end === <span class="hljs-literal">undefined</span> ?
+        len :
+        end &gt;&gt; <span class="hljs-number">0</span>
+  
+  end = end &lt; <span class="hljs-number">0</span> ?
+        <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(end + len, <span class="hljs-number">0</span>) :
+        <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(end, len)
+  
+  <span class="hljs-keyword">while</span>(start &lt; end) {
+    obj[start] = value
+    start++
+  }
+  
+  <span class="hljs-keyword">return</span> obj
+}
+</code></pre>
+<h1 id="8%E3%80%81find%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">8、find（ES6新增）</h1>
+<p>find()是Array原型下的方法，该方法返回提供的数组中满足提供的测试功能的第一个元素的值。如果没有值满足测试功能，则返回undefined。
+find的第一个参数是回调函数，每遍历一个元素都会执行回调函数，该回调函数接收三个参数：（elem，index，array），回调函数的返回值为布尔值，如果布尔值为真，则结束遍历，将该元素返回。
+find无法更改数组元素的值（即不能通过回调函数的第一个形参对数组元素进行改变），find会在第一次执行回调函数的时候，拿到这个数组最初的索引范围。如果在find的回调函数中对数组进行删除操作，会在遍历到数组下标为空的item值时将item值设为undefined（即遍历的次数仍是最初的数组长度）。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">of</span>(<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr.<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">elem</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> elem &gt; <span class="hljs-number">4</span>
+})) <span class="hljs-comment">// 5</span>
+
+
+<span class="hljs-keyword">var</span> arr = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]
+arr.<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">item, index</span>) =&gt;</span> {
+	<span class="hljs-keyword">if</span> (index === <span class="hljs-number">0</span>) {
+    arr.<span class="hljs-title function_">splice</span>(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)
+  }
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item)
+}) <span class="hljs-comment">// 输出 1 3 4 undefined</span>
+
+<span class="hljs-keyword">var</span> arr = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]
+arr.<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">item, index</span>) =&gt;</span> {
+	<span class="hljs-keyword">if</span> (index === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">delete</span> arr[<span class="hljs-number">1</span>]
+  }
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item)
+}) <span class="hljs-comment">// 输出 1 undefined 3 4</span>
+</code></pre>
+<p>实现fill：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFind</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">cb</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span> == <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&#x27;This is null or not defined&#x27;</span>)
+  }
+  
+  <span class="hljs-keyword">if</span> (<span class="hljs-title function_">typeof</span>(cb) !== <span class="hljs-string">&#x27;function&#x27;</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&#x27;Callback must be a function&#x27;</span>)
+  }
+
+  <span class="hljs-keyword">var</span> obj = <span class="hljs-title class_">Object</span>(<span class="hljs-variable language_">this</span>),
+      len = obj.<span class="hljs-property">length</span> &gt;&gt;&gt; <span class="hljs-number">0</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>],
+      step = <span class="hljs-number">0</span>,
+      tf = <span class="hljs-literal">false</span>
+
+  <span class="hljs-keyword">while</span> (step &lt; len) {
+    tf = cb.<span class="hljs-title function_">apply</span>(arg2, [obj[step], step, obj])
+
+    <span class="hljs-keyword">if</span> (tf === <span class="hljs-literal">true</span>) {
+      <span class="hljs-keyword">return</span> obj[step]
+    }
+
+    step++
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>
+}
+</code></pre>
+<h1 id="9%E3%80%81findindex%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">9、findIndex（ES6新增）</h1>
+<p>findIndex()是Array原型下的方法，该满足提供的测试功能的数组中第一个元素的索引。如果不存在，则返回-1。
+findIndex特性与find大致相同。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">of</span>(<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr.<span class="hljs-title function_">findIndex</span>(<span class="hljs-function"><span class="hljs-params">elem</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> elem &gt; <span class="hljs-number">4</span>
+})) <span class="hljs-comment">// 2</span>
+</code></pre>
+<h1 id="10%E3%80%81flat%EF%BC%88es2019%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">10、flat（ES2019新增）</h1>
+<p>flat是Array原型下的方法，该方法创建一个新数组，其中所有子数组元素以递归方式连接到指定深度。flat方法会剔除所有的数组空隙empty。
+flat接收一个参数，该参数为指定嵌套数组结构应展平的深度的深度级别。默认为 1。该参数的有效范围为[1, 正无穷），（负无穷，0]都会返回未扁平化的新数组。如果是非数值类型则会先转为数值类型再判断。
+实现flat：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-comment">//利用reduce</span>
+<span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFlat</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      deep = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">0</span>] !== <span class="hljs-title class_">Infinity</span> ? <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">0</span>] === <span class="hljs-literal">undefined</span> ? <span class="hljs-number">1</span>
+  																																: <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">0</span>] &gt;&gt;&gt; <span class="hljs-number">0</span>
+      																: <span class="hljs-title class_">Infinity</span>
+
+  <span class="hljs-keyword">return</span> deep &gt; <span class="hljs-number">0</span> 
+        ? arr.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">prev, item</span>) =&gt;</span> {
+          <span class="hljs-keyword">return</span> prev.<span class="hljs-title function_">concat</span>(
+            <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(item) 
+            ? item.<span class="hljs-title function_">myFlat</span>(deep - <span class="hljs-number">1</span>)
+            : item
+          )
+        }, [])
+        : arr
+}
+
+<span class="hljs-comment">//利用forEach</span>
+<span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFlat</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      deep = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">0</span>] !== <span class="hljs-title class_">Infinity</span> ? <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">0</span>] &gt;&gt;&gt; <span class="hljs-number">0</span> : <span class="hljs-title class_">Infinity</span>,
+      res = []
+
+  ;(<span class="hljs-keyword">function</span> <span class="hljs-title function_">_flat</span>(<span class="hljs-params">arr, deep</span>) {
+    arr.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(item) &amp;&amp; deep &gt; <span class="hljs-number">0</span>) {
+        <span class="hljs-title function_">_flat</span>(item, deep - <span class="hljs-number">1</span>)
+      } <span class="hljs-keyword">else</span> {
+        res.<span class="hljs-title function_">push</span>(item)
+      }
+    })
+  })(arr, deep)
+
+  <span class="hljs-keyword">return</span> res
+}
+
+<span class="hljs-comment">//利用for of</span>
+<span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFlat</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      deep = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">0</span>] !== <span class="hljs-title class_">Infinity</span> ? <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">0</span>] &gt;&gt;&gt; <span class="hljs-number">0</span> : <span class="hljs-title class_">Infinity</span>,
+      res = []
+
+  ;(<span class="hljs-keyword">function</span> <span class="hljs-title function_">_flat</span>(<span class="hljs-params">arr, deep</span>) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">of</span> arr) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(item) &amp;&amp; deep &gt; <span class="hljs-number">0</span>) {
+        <span class="hljs-title function_">_flat</span>(item, deep - <span class="hljs-number">1</span>)
+      } <span class="hljs-keyword">else</span> {
+        item !== <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> &amp;&amp; res.<span class="hljs-title function_">push</span>(item)
+      }
+    }
+  })(arr, deep)
+
+  <span class="hljs-keyword">return</span> res
+}
+</code></pre>
+<h1 id="11%E3%80%81flatmap%EF%BC%88es2020%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">11、flatMap（ES2020新增）</h1>
+<p>flatMap() 方法首先使用映射函数映射每个元素，然后将结果压缩成一个新数组。它与 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">map</a> 连着深度值为1的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat">flat</a> 几乎相同，但 flatMap 通常在合并成一种方法的效率稍微高一些。
+flatMap的第一个参数是回调函数，每遍历一个元素都会执行回调函数，该回调函数接收三个参数：（elem，index，array），如果elem为引用值，则对elem的修改会影响到原数组中的元素，flatMap（）的执行结果会返回所有回调函数返回结果的数组集合。
+map的第二个参数是更改回调函数中的this指向，要求接收一个对象，如果实参为原始值，会将其强制转换成引用值，null和undefined无效。
+实现flatMap：</p>
+<pre><code class="hljs"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFlatMap</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">cb</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> cb !== <span class="hljs-string">&#x27;function&#x27;</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&#x27;callback must be a function&#x27;</span>)
+  }
+
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      len = arr.<span class="hljs-property">length</span>,
+      arg2 = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>],
+      res = [],
+      item
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    item = cb.<span class="hljs-title function_">apply</span>(arg2, [arr[i], i, arr])
+    item &amp;&amp; res.<span class="hljs-title function_">push</span>(item)
+  }
+
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">flat</span>()
+}
+</code></pre>
+<h1 id="12%E3%80%81array.from%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">12、Array.from（ES6新增）</h1>
+<p>Array.from() 方法从一个类似数组或可迭代对象创建一个新的，浅拷贝的数组实例。
+如果Array.from()的参数为数值/布尔类型/正则或普通对象，则不作处理并返回一个空数组。如果参数为null或undefined，则会抛出错误。如果没有参数，则会抛出跟传入undefined一样的错误。
+Array.from()的第一个参数必须是可迭代对象或者是标准的类数组。
+Array.from()的第二个参数（可选）是一个回调函数，如果指定了该参数，新数组中的每个元素会执行该回调函数，必须在回调函数中返回元素才会加入到最终的新数组中。该回调函数接收两个参数，第一个参数为元素本身，第二个参数为元素在数组中对应的下标。
+Array.from()的第三个参数为指定回调函数中的this指向。
+实现from：</p>
+<pre><code class="hljs"><span class="hljs-title class_">Array</span>.<span class="hljs-property">myFrom</span> = (<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> toInteger = <span class="hljs-keyword">function</span>(<span class="hljs-params">num</span>) {
+    <span class="hljs-keyword">var</span> <span class="hljs-built_in">number</span> = <span class="hljs-title class_">Number</span>(num)
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(<span class="hljs-built_in">number</span>)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
+    }
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">number</span> === <span class="hljs-number">0</span> || !<span class="hljs-built_in">isFinite</span>(<span class="hljs-built_in">number</span>)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">number</span>
+    }
+
+    <span class="hljs-keyword">return</span> (<span class="hljs-built_in">number</span> &gt; <span class="hljs-number">0</span> ? <span class="hljs-number">1</span>: -<span class="hljs-number">1</span>) * <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">abs</span>(<span class="hljs-built_in">number</span>))
+  }
+
+  <span class="hljs-keyword">var</span> isCallable = <span class="hljs-keyword">function</span>(<span class="hljs-params">fn</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> fn === <span class="hljs-string">&#x27;function&#x27;</span> || <span class="hljs-title class_">Object</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">toString</span>.<span class="hljs-title function_">call</span>(fn) === <span class="hljs-string">&#x27;[object Function]&#x27;</span>
+  }
+
+  <span class="hljs-keyword">var</span> toLength = <span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) {
+    <span class="hljs-keyword">var</span> len = <span class="hljs-title function_">toInteger</span>(value)
+    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(len, <span class="hljs-number">0</span>), maxSafeInteger)
+  }
+
+  <span class="hljs-keyword">var</span> maxSafeInteger = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">pow</span>(<span class="hljs-number">2</span>, <span class="hljs-number">53</span>) - <span class="hljs-number">1</span>
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span>(<span class="hljs-params">arrayLike</span>) {
+    <span class="hljs-keyword">var</span> _self = <span class="hljs-variable language_">this</span>,
+        arr = <span class="hljs-title class_">Object</span>(arrayLike),
+        i = <span class="hljs-number">0</span>,
+        item
+
+    <span class="hljs-keyword">if</span> (arrayLike == <span class="hljs-literal">null</span>) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&quot;Array.from requires an array-like object - not null or undefined&quot;</span>)
+    } 
+
+    <span class="hljs-keyword">var</span> mapfn = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>] || <span class="hljs-built_in">void</span> <span class="hljs-number">0</span>,
+        T
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> mapfn !== <span class="hljs-string">&#x27;undefined&#x27;</span>) {
+      <span class="hljs-keyword">if</span> (!<span class="hljs-title function_">isCallable</span>(mapfn)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&#x27;The second argument must be a function&#x27;</span>)
+      }
+      <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">arguments</span>.<span class="hljs-property">length</span> &gt; <span class="hljs-number">2</span>) {
+        T = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">2</span>]
+      }
+    }
+
+    <span class="hljs-keyword">var</span> len = <span class="hljs-title function_">toLength</span>(arr.<span class="hljs-property">length</span>)
+
+    <span class="hljs-keyword">var</span> A = <span class="hljs-title function_">isCallable</span>(_self) ? <span class="hljs-title class_">Object</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">_self</span>(len)) : <span class="hljs-keyword">new</span> <span class="hljs-title class_">Array</span>(len)
+
+    <span class="hljs-keyword">while</span>(i &lt; len) {
+      item = arr[i]
+      <span class="hljs-keyword">if</span> (mapfn) {
+        A[i] = <span class="hljs-keyword">typeof</span> T === <span class="hljs-string">&#x27;undefined&#x27;</span> ? <span class="hljs-title function_">mapfn</span>(A[i], i) : mapfn.<span class="hljs-title function_">apply</span>(T, [A[i], i])
+      } <span class="hljs-keyword">else</span> {
+        A[i] = item
+      }
+
+      i++
+    }
+
+    A.<span class="hljs-property">length</span> = len
+
+    <span class="hljs-keyword">return</span> A
+
+  }
+})()
+</code></pre>
+<h1 id="13%E3%80%81array.prototype.includes%EF%BC%88es2016%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">13、Array.prototype.includes（ES2016新增）</h1>
+<p>该includes()方法确定数组是否在其条目中包含某个值，返回true或 false视情况而定。includes()的原则为零值相等。
+第一个参数为想要查找的元素。区分字符串数字与数字以及大小写。如果不填参数则默认为undefined。
+第二个参数为在此数组中开始搜索的位置。如果该参数为负数，则从（array.length + 负数）开始搜索。如果该参数超出数组长度，则return false。
+实现includes：</p>
+<pre><code class="hljs"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myIncludes</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">item</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span> == <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeError</span>(<span class="hljs-string">&#x27;this is null or not defined&#x27;</span>)
+  }
+
+  <span class="hljs-keyword">var</span> obj = <span class="hljs-title class_">Object</span>(<span class="hljs-variable language_">this</span>),
+      isExit = <span class="hljs-literal">false</span>,
+      len = obj.<span class="hljs-property">length</span> &gt;&gt;&gt; <span class="hljs-number">0</span>,
+      fromIndex = <span class="hljs-variable language_">arguments</span>[<span class="hljs-number">1</span>] | <span class="hljs-number">0</span>
+  
+  <span class="hljs-keyword">if</span> (len &lt;= <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+  }
+
+  fromIndex = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(fromIndex &lt; <span class="hljs-number">0</span> ? fromIndex + len : fromIndex, <span class="hljs-number">0</span>)
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = fromIndex; i &lt; len; i++) {
+    <span class="hljs-keyword">if</span> (item === obj[i]) {
+      isExit = <span class="hljs-literal">true</span>
+      <span class="hljs-keyword">break</span>
+    }
+  }
+
+  <span class="hljs-keyword">return</span> isExit
+}
+</code></pre>
+
+</body>
+</html>

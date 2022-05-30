@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <p>结合Canvas开发一些小工具。</p>
+<h1 id="%E5%9B%BE%E5%83%8F%E6%93%8D%E4%BD%9C" tabindex="-1">图像操作</h1>
+<p>Canvas具有导入图片到画布、从画布导出图片的能力，同时其本身可以对画布进行各种绘制操作，所以常常作为图片处理的一种方式。</p>
+<h2 id="%E6%94%BE%E5%A4%A7%E9%95%9C" tabindex="-1">放大镜</h2>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage">CanvasRenderingContext2D.drawImage()</a> 即为Canvas对于图像/视频操作的一个API之一，可以将图片资源以所提供参数（定位或大小）在Canvas中进行绘制。用其做一个<a href="https://codepen.io/stan-bk/pen/NWXMXYm">放大镜</a>功能，可以更好的理解该方法。该功能借助<code class="hljs"><span class="hljs-attribute">drawImage</span></code>方法，将canvas中的图片按一定大小截取并将其加倍展示。
+<a href="https://codepen.io/stan-bk/embed/NWXMXYm">点击查看【codepen】</a></p>
+<h2 id="%E5%9B%BE%E7%89%87%E8%A3%81%E5%89%AA" tabindex="-1">图片裁剪</h2>
+<p>图片裁剪的思路：根据鼠标点击坐标，通过<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/isPointInPath">CanvasRenderingContext2D.isPointInPath()</a>方法判断坐标是否于绘制裁剪框的路径上，通过鼠标的点击移动更新裁剪框坐标，根据裁剪框坐标，使用<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/getImageData">CanvasRenderingContext2D.getImageData()</a>方法进行Canvas的部分截取，截取内容为裁剪图片部分的像素点集合以及裁剪图片的宽高。用<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/putImageData">CanvasRenderingContext2D.putImageData()</a>方法可以将截取到的<code class="hljs"><span class="hljs-attribute">ImageData</span></code>对象于Canvas中重新绘制，本例以此方法实现截取图片的预览功能。最后，根据<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLCanvasElement/toDataURL">HTMLCanvasElement.toDataURL()</a>方法搭配<code class="hljs"><span class="hljs-section">&lt;a&gt;</span></code>的<code class="hljs"><span class="hljs-attribute">download</span></code>属性可进行Canvas画布内容的下载。
+详细效果如下：
+<a href="https://codepen.io/stan-bk/embed/jOYKLrQ">点击查看【codepen】</a></p>
+<h1 id="%E8%A7%86%E9%A2%91%E6%93%8D%E4%BD%9C" tabindex="-1">视频操作</h1>
+<h2 id="%E8%A7%86%E9%A2%91%E7%BB%BF%E5%B9%95" tabindex="-1">视频绿幕</h2>
+<p>根据<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage">CanvasRenderingContext2D.drawImage()</a>方法可绘制<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLVideoElement">HTMLVideoElement</a>类型对象的特性，可以绘制视频当前帧于画布中，根据<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/getImageData">getImageData()</a>方法取出画布色块，将属于绿幕部分像素的alpha值设定为0，即可将保留除绿幕外的视频帧部分，原先绿幕部分透明后即可显示出画布层下方的等比背景图片。
+详细效果如下：
+<a href="https://codepen.io/stan-bk/embed/gOojPgx">点击查看【codepen】</a></p>
+
+</body>
+</html>

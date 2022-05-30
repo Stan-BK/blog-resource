@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <p>Canvas API 提供了一个通过<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript">JavaScript</a> 和 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML">HTML</a>的<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/canvas">&lt;canvas&gt;</a>元素来绘制图形的方式。它可以用于动画、游戏画面、数据可视化、图片编辑以及实时视频处理等方面。现在主流浏览器都支持Canvas（IE9以上支持）。</p>
+<h1 id="1%E3%80%81%E5%AE%9A%E4%B9%89%E4%B8%80%E4%B8%AA%E7%94%BB%E5%B8%83" tabindex="-1">1、定义一个画布</h1>
+<pre><code class="hljs language-css">&lt;style&gt;
+  <span class="hljs-selector-id">#canvas</span>{
+    <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> <span class="hljs-number">#424242</span> solid;
+  }
+&lt;/style&gt;
+</code></pre>
+<pre><code class="hljs language-html">
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">canvas</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;canvas&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;300&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;150&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">canvas</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+</code></pre>
+<h1 id="2%E3%80%81%E6%B8%B2%E6%9F%93%E4%B8%8A%E4%B8%8B%E6%96%87" tabindex="-1">2、渲染上下文</h1>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/canvas">&lt;canvas&gt;</a> 元素创造了一个固定大小的画布，它公开了一个或多个渲染上下文，其可以用来绘制和处理要展示的内容。canvas元素有一个getContext()方法，这个方法是用来获得渲染上下文和它的绘画功能。getContext()只有一个参数，上下文的格式。用getContext('2d')方法获取到的是canvas提供的CanvasRenderingContext2D接口。如果要获取3d的WebGLRenderingContext接口，则需要调用getContext('webgl')方法。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> canvas = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;canvas&#x27;</span>)
+<span class="hljs-keyword">var</span> ctx = canvas.<span class="hljs-title function_">getContext</span>(<span class="hljs-string">&#x27;2d&#x27;</span>) <span class="hljs-comment">//获取到了2d的canvas上下文</span>
+</code></pre>
+<h1 id="3%E3%80%81%E7%BB%98%E5%88%B6%E5%9F%BA%E6%9C%AC%E5%9B%BE%E5%BD%A2" tabindex="-1">3、绘制基本图形</h1>
+<h2 id="1%E3%80%81%E7%BB%98%E5%88%B6%E7%9F%A9%E5%BD%A2" tabindex="-1">1、绘制矩形</h2>
+<h3 id="ctx.rect" tabindex="-1">ctx.rect</h3>
+<p>设置矩形路径到路径列表中，有四个参数，分别为（x坐标、y坐标、宽、高）</p>
+<h3 id="ctx.fillstyle" tabindex="-1">ctx.fillstyle</h3>
+<p>设置绘制图形的颜色或样式。</p>
+<h3 id="ctx.fillrect" tabindex="-1">ctx.fillRect</h3>
+<p>绘制图形的坐标及宽高，有四个参数，分别为（x坐标、y坐标、宽、高）。</p>
+<h3 id="ctx.clearrect" tabindex="-1">ctx.clearRect</h3>
+<p>清除区域内的图像，有四个参数，分别为（x坐标、y坐标、宽、高）。</p>
+<h3 id="ctx.strokestyle" tabindex="-1">ctx.strokeStyle</h3>
+<p>设置绘制图形轮廓的颜色或样式。</p>
+<h3 id="ctx.strokerect" tabindex="-1">ctx.strokeRect</h3>
+<p>绘制图形的轮廓，有四个参数，分别为（x坐标、y坐标、宽、高）。</p>
+<h2 id="2%E3%80%81%E7%BB%98%E5%88%B6%E7%BA%BF%E6%80%A7%E5%9B%BE%E5%BD%A2" tabindex="-1">2、绘制线性图形</h2>
+<h3 id="ctx.beginpath" tabindex="-1">ctx.beginPath</h3>
+<p>初始化路径列表。</p>
+<h3 id="ctx.moveto" tabindex="-1">ctx.moveTo</h3>
+<p>移动画笔到指定位置，有两个参数，分别为（x坐标、y坐标）。</p>
+<h3 id="ctx.lineto" tabindex="-1">ctx.lineTo</h3>
+<p>设置画笔走向，会根据上一个点位到目标位置形成一条路径，有两个参数，分别为（x坐标、y坐标）。</p>
+<h3 id="ctx.linewidth" tabindex="-1">ctx.lineWidth</h3>
+<p>设置路径宽度</p>
+<h3 id="ctx.linecap" tabindex="-1">ctx.lineCap</h3>
+<p>设置线条端点形状。可设置为butt（方形）、round（圆形）、square（方形，添加一个宽度相等、高度为线宽一半的框）</p>
+<h3 id="ctx.linejoin" tabindex="-1">ctx.lineJoin</h3>
+<p>设置两条线段交叉处的形状。可设置为round、bevel（斜接）、miter
+其中设置为miter时，会受miterLimit属性影响，即如果满足<img src="https://cdn.nlark.com/yuque/__latex/49b8e6831b716ef14736638ad1522147.svg#card=math&amp;code=miterlength%20%2F%20lineWidth%20%3C%20miterLimit&amp;id=S6iaf" alt="">时，线段交叉处为尖角，反之则会被miter length会被切割，切割后miter length为2（miter为交叉处内外边缘长度）。</p>
+<h3 id="ctx.closepath" tabindex="-1">ctx.closePath</h3>
+<p>闭合路径，即将当前最终路径点与当前子路径初始点相连。</p>
+<h3 id="ctx.fill" tabindex="-1">ctx.fill</h3>
+<p>将路径列表以实心的样式全部绘制到画布。</p>
+<h3 id="ctx.stroke" tabindex="-1">ctx.stroke</h3>
+<p>将路径列表以空心的样式全部绘制到画布。可以设置ctx.strokeStyle来更改画笔颜色。</p>
+<h2 id="3%E3%80%81%E7%BB%98%E5%88%B6%E5%9C%86%E5%BD%A2" tabindex="-1">3、绘制圆形</h2>
+<h3 id="ctx.arc" tabindex="-1">ctx.arc</h3>
+<p>绘制圆形，有六个参数，分别为（x坐标、y坐标、radius半径、startAngle起始角度、endAngle结束角度、anticlockwise绘制方向是否逆时针），第六为参数的默认值为false，即默认顺时针。</p>
+<pre><code class="hljs language-javascript">ctx.<span class="hljs-title function_">beginPath</span>()
+ctx.<span class="hljs-title function_">arc</span>(<span class="hljs-number">100</span>, <span class="hljs-number">100</span>, <span class="hljs-number">50</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1.5</span> * <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span>, <span class="hljs-literal">false</span>) <span class="hljs-comment">//Math.PI 表示180°，false表示顺时针绘制</span>
+ctx.<span class="hljs-property">strokeStyle</span> = <span class="hljs-string">&#x27;orange&#x27;</span>
+ctx.<span class="hljs-property">lineWidth</span> = <span class="hljs-number">5</span>
+ctx.<span class="hljs-title function_">stroke</span>()
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627630995089-5d295d05-21f4-421c-b520-3e37670d655c.png#clientId=uc4913330-44fb-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=105&amp;id=uc30eb811&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=171&amp;originWidth=213&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=7066&amp;status=done&amp;style=none&amp;taskId=u60baf241-8e4a-4fc0-a1b9-473d7e046e3&amp;title=&amp;width=130.5" alt="image.png"></p>
+<h3 id="ctx.arcto" tabindex="-1">ctx.arcTo</h3>
+<p>绘制圆弧，有五个参数，分别为（控制点1的x坐标、控制点1的y坐标、控制点2的x坐标、控制点2的y坐标、radius半径）。以前一个moveTo或lineTo等函数的止点，根据该点到控制点1连接的直线以及控制点1到控制点2连接的直线，以这两条直线作为目标圆的切线、指定半径radius绘制圆。</p>
+<pre><code class="hljs language-javascript">ctx.<span class="hljs-title function_">setLineDash</span>([])
+ctx.<span class="hljs-title function_">beginPath</span>();
+ctx.<span class="hljs-title function_">moveTo</span>(<span class="hljs-number">150</span>, <span class="hljs-number">20</span>);
+ctx.<span class="hljs-title function_">arcTo</span>(<span class="hljs-number">150</span>,<span class="hljs-number">100</span>,<span class="hljs-number">50</span>,<span class="hljs-number">20</span>,<span class="hljs-number">45</span>);
+ctx.<span class="hljs-title function_">stroke</span>();
+
+ctx.<span class="hljs-property">fillStyle</span> = <span class="hljs-string">&#x27;blue&#x27;</span>;
+<span class="hljs-comment">// base point</span>
+ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">150</span>, <span class="hljs-number">20</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>);
+
+ctx.<span class="hljs-property">fillStyle</span> = <span class="hljs-string">&#x27;red&#x27;</span>;
+<span class="hljs-comment">// control point one</span>
+ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">150</span>, <span class="hljs-number">100</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>);
+<span class="hljs-comment">// control point two</span>
+ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">50</span>, <span class="hljs-number">20</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>);
+<span class="hljs-comment">//</span>
+ctx.<span class="hljs-title function_">setLineDash</span>([<span class="hljs-number">5</span>,<span class="hljs-number">5</span>])
+ctx.<span class="hljs-title function_">moveTo</span>(<span class="hljs-number">150</span>, <span class="hljs-number">20</span>);
+ctx.<span class="hljs-title function_">lineTo</span>(<span class="hljs-number">150</span>,<span class="hljs-number">100</span>);
+ctx.<span class="hljs-title function_">lineTo</span>(<span class="hljs-number">50</span>, <span class="hljs-number">20</span>);
+ctx.<span class="hljs-title function_">stroke</span>();
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627636750087-69e36bd8-577e-4549-88a2-2735b4d91b08.png#clientId=uc4913330-44fb-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=94&amp;id=u00178645&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=188&amp;originWidth=261&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=6016&amp;status=done&amp;style=none&amp;taskId=u5d4088a8-9e1a-4917-826e-aac3fe5fd98&amp;title=&amp;width=130.5" alt="image.png"></p>
+<h2 id="4%E3%80%81%E8%B4%9D%E8%B5%9B%E5%B0%94%E6%9B%B2%E7%BA%BF" tabindex="-1">4、贝赛尔曲线</h2>
+<h3 id="ctx.quadraticcurveto" tabindex="-1">ctx.quadraticCurveTo</h3>
+<p>绘制二次贝塞尔曲线，有四个参数，分别为（cp1x,cp1y为一个控制点，x,y为结束点）。</p>
+<h3 id="ctx.beziercurveto" tabindex="-1">ctx.bezierCurveTo</h3>
+<p>绘制三次贝塞尔曲线，有六个参数，分别为（cp1x,cp1y为控制点一，cp2x,cp2y为控制点二，x,y为结束点）。</p>
+<h1 id="4%E3%80%81%E6%93%8D%E4%BD%9C%E7%94%BB%E5%B8%83" tabindex="-1">4、操作画布</h1>
+<h2 id="1%E3%80%81%E7%94%BB%E5%B8%83%E4%BD%8D%E7%A7%BB" tabindex="-1">1、画布位移</h2>
+<h3 id="ctx.translate" tabindex="-1">ctx.translate</h3>
+<p>将画布位移到指定坐标，即重置映射画布的（0，0）位置，不会对已绘制图形产生影响，有两个参数，分别为（x, y）。</p>
+<h2 id="2%E3%80%81%E4%BF%9D%E5%AD%98%E3%80%81%E8%BF%98%E5%8E%9F%E7%94%BB%E5%B8%83%E9%85%8D%E7%BD%AE" tabindex="-1">2、保存、还原画布配置</h2>
+<h3 id="ctx.save" tabindex="-1">ctx.save</h3>
+<p>保存当前画布的设置。</p>
+<h3 id="ctx.restore" tabindex="-1">ctx.restore</h3>
+<p>将画布的设置重置到ctx.save处保存的配置。</p>
+<h2 id="3%E3%80%81%E7%94%BB%E5%B8%83%E7%BC%A9%E6%94%BE" tabindex="-1">3、画布缩放</h2>
+<h3 id="ctx.scale" tabindex="-1">ctx.scale</h3>
+<p>缩放当前绘图的大小，只对已绘制的图像产生影响，有两个参数，分别为（x坐标放大倍数，y坐标放大倍数），不仅图像大小展示会发生改变，图像相对于画布x，y坐标的距离也会产生相应倍数的位移。</p>
+<h2 id="4%E3%80%81%E7%94%BB%E5%B8%83%E6%97%8B%E8%BD%AC" tabindex="-1">4、画布旋转</h2>
+<h3 id="ctx.rotate" tabindex="-1">ctx.rotate</h3>
+<p>将画布旋转一定角度，不会对已绘制图形产生影响，有一个参数为（angle旋转角度）。</p>
+<h2 id="5%E3%80%81%E7%94%BB%E5%B8%83%E8%B0%83%E6%95%B4" tabindex="-1">5、画布调整</h2>
+<h3 id="ctx.transform" tabindex="-1">ctx.transform</h3>
+<p>调整画布，不会对已绘制图形产生影响，有六个参数，分别为（水平缩放，水平倾斜，垂直倾斜，垂直缩放，水平运动，垂直运动）。</p>
+<h3 id="ctx.settransform" tabindex="-1">ctx.setTransform</h3>
+<p>调整画布，无视之前画布位移等配置，其余同transform。</p>
+<h1 id="5%E3%80%81%E7%BB%98%E5%88%B6%E5%9B%BE%E5%83%8F" tabindex="-1">5、绘制图像</h1>
+<h2 id="1%E3%80%81%E5%BC%95%E7%94%A8%E5%9B%BE%E6%A1%88" tabindex="-1">1、引用图案</h2>
+<h3 id="ctx.createpattern" tabindex="-1">ctx.createPattern</h3>
+<p>使用指定的图像和重复创建图案，有两个参数，分别为（img 图像资源，repetition 如何重置图案）。
+img参数可为以下任意一种</p>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement">HTMLImageElement</a>( <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img">&lt;img&gt;</a>)</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/SVGImageElement">SVGImageElement</a>( <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/image">&lt;image&gt;</a>)</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement">HTMLVideoElement</a>( <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">&lt;video&gt;</a>, 通过使用视频的捕获)</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement">HTMLCanvasElement</a>( <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas">&lt;canvas&gt;</a>)</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap">ImageBitmap</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas">OffscreenCanvas</a></li>
+</ul>
+<p>repetition可为</p>
+<ul>
+<li>&quot;repeat&quot; （两个方向）</li>
+<li>&quot;repeat-x&quot; （仅限水平）</li>
+<li>&quot;repeat-y&quot; （仅限垂直）</li>
+<li>&quot;no-repeat&quot; （两个方向都没有）</li>
+</ul>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> img = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Image</span>()
+img.<span class="hljs-property">src</span> = <span class="hljs-string">&#x27;./头像.jpg&#x27;</span>
+img.<span class="hljs-property">onload</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> pattern = ctx.<span class="hljs-title function_">createPattern</span>(img, <span class="hljs-string">&#x27;no-repeat&#x27;</span>)
+  ctx.<span class="hljs-property">fillStyle</span> = pattern
+  ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>, <span class="hljs-number">500</span>, <span class="hljs-number">500</span>)
+}
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627802793443-d89ecb08-8812-485c-be82-6065eb6b296b.png#clientId=u7a411db0-683c-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=224&amp;id=uff11f91a&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=526&amp;originWidth=525&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=70364&amp;status=done&amp;style=none&amp;taskId=u21125f2c-f7db-496a-ac60-7c199c2b9ac&amp;title=&amp;width=224" alt="image.png"></p>
+<h2 id="2%E3%80%81%E7%BB%98%E5%88%B6%E7%BA%BF%E6%80%A7%E6%B8%90%E5%8F%98%E5%9B%BE%E6%A1%88" tabindex="-1">2、绘制线性渐变图案</h2>
+<h3 id="ctx.createlineargradient" tabindex="-1">ctx.createLinearGradient</h3>
+<p>创建一个沿参数坐标指定的直线的渐变。有四个参数，分别为（x0, y0, x1, y1）。返回值为一个根据指定线路初始化的线性对象CanvasGradient，可设置为fillStyle的值。
+CanvasGradient对象有一个方法<code class="hljs"><span class="hljs-function"><span class="hljs-title">addColorStop</span><span class="hljs-params">()</span></span></code>。</p>
+<h3 id="canvasgradient.addcolorstop" tabindex="-1">CanvasGradient.addColorStop</h3>
+<p>该方法添加一个由偏移值和颜色值指定的断点到渐变，有两个参数，分别为（offset 0~1之间的偏移值，color 颜色值）。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> gradient = ctx.<span class="hljs-title function_">createLinearGradient</span>(<span class="hljs-number">0</span>, <span class="hljs-number">500</span>, <span class="hljs-number">500</span>, <span class="hljs-number">500</span>)
+gradient.<span class="hljs-title function_">addColorStop</span>(<span class="hljs-number">0</span>, <span class="hljs-string">&#x27;lightblue&#x27;</span>)
+gradient.<span class="hljs-title function_">addColorStop</span>(<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;lightpink&#x27;</span>)
+ctx.<span class="hljs-property">fillStyle</span> = gradient
+ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">500</span>, <span class="hljs-number">500</span>)
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627806370256-10736fe4-5b6f-45f3-b2e9-4301ec959024.png#clientId=u7a411db0-683c-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=211&amp;id=ua69c9e36&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=530&amp;originWidth=526&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=55132&amp;status=done&amp;style=none&amp;taskId=ud8b3b0d3-5727-49fd-965e-f09153ac381&amp;title=&amp;width=209" alt="image.png"></p>
+<h3 id="ctx.createradiulgradient" tabindex="-1">ctx.createRadiulGradient</h3>
+<p>据参数确定两个圆的坐标，绘制放射性渐变。有六个参数，分别为（x0, y0, r0 开始圆的半径, x1, y1, r1 结束圆的半径）返回值为CanvasGradient对象。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> gradient = ctx.<span class="hljs-title function_">createRadialGradient</span>(<span class="hljs-number">250</span>, <span class="hljs-number">250</span>, <span class="hljs-number">100</span>, <span class="hljs-number">250</span>, <span class="hljs-number">250</span>, <span class="hljs-number">200</span>)
+gradient.<span class="hljs-title function_">addColorStop</span>(<span class="hljs-number">0</span>, <span class="hljs-string">&#x27;lightblue&#x27;</span>)
+gradient.<span class="hljs-title function_">addColorStop</span>(<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;lightpink&#x27;</span>)
+ctx.<span class="hljs-property">fillStyle</span> = gradient
+ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">50</span>, <span class="hljs-number">50</span>, <span class="hljs-number">400</span>,<span class="hljs-number">400</span>)
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627809002065-5471c442-803a-4193-8366-13ba3abf2edc.png#clientId=u7a411db0-683c-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=225&amp;id=u24f86dff&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=528&amp;originWidth=528&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=106565&amp;status=done&amp;style=none&amp;taskId=u86f28a2f-06d4-4dcb-b4f9-18241def6fa&amp;title=&amp;width=225" alt="image.png"></p>
+<h2 id="3%E3%80%81%E7%BB%98%E5%88%B6%E9%98%B4%E5%BD%B1" tabindex="-1">3、绘制阴影</h2>
+<h3 id="ctx.shadowcolor%E3%80%81ctx.shadowoffsetx%E3%80%81ctx.shadowoffsety%E3%80%81ctx.shadowblur" tabindex="-1">ctx.shadowColor、ctx.shadowOffsetX、ctx.shadowOffsetY、ctx.shadowBlur</h3>
+<p>分别为设定阴影颜色、阴影x轴偏移量、阴影y轴偏移量、阴影模糊度</p>
+<pre><code class="hljs language-javascript">ctx.<span class="hljs-property">shadowColor</span> = <span class="hljs-string">&#x27;pink&#x27;</span>
+ctx.<span class="hljs-property">shadowOffsetX</span> = <span class="hljs-number">15</span>
+ctx.<span class="hljs-property">shadowOffsetY</span> = <span class="hljs-number">15</span>
+ctx.<span class="hljs-property">shadowBlur</span> = <span class="hljs-number">15</span>
+ctx.<span class="hljs-property">fillStyle</span> = <span class="hljs-string">&#x27;lightpink&#x27;</span>
+ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">50</span>, <span class="hljs-number">50</span>, <span class="hljs-number">400</span>,<span class="hljs-number">400</span>)
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627813631901-0e81a98f-c3f9-4296-8e4b-6624c2b28051.png#clientId=u7a411db0-683c-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=215&amp;id=u6d315b81&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=524&amp;originWidth=523&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=14384&amp;status=done&amp;style=none&amp;taskId=uecb9e759-e847-4c9c-ac36-61f8938f45e&amp;title=&amp;width=215" alt="image.png"></p>
+<h2 id="4%E3%80%81%E8%AE%BE%E7%BD%AE%E6%96%87%E6%9C%AC" tabindex="-1">4、设置文本</h2>
+<h3 id="ctx.filltext%E3%80%81ctx.font" tabindex="-1">ctx.fillText、ctx.font</h3>
+<p>ctx.fillText()有三个参数，分别为（text 文本，x， y），ctx.font可以修改文本样式。</p>
+<pre><code class="hljs language-javascript">ctx.<span class="hljs-property">font</span> = <span class="hljs-string">&#x27;50px sans-serif&#x27;</span>
+ctx.<span class="hljs-property">fillStyle</span> = <span class="hljs-string">&#x27;lightblue&#x27;</span>
+ctx.<span class="hljs-title function_">fillText</span>(<span class="hljs-string">&#x27;这是一段文本&#x27;</span>, <span class="hljs-number">100</span>, <span class="hljs-number">100</span>)
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627814306675-3b94b710-5920-4eb7-8ade-3f8c1a8194bd.png#clientId=u7a411db0-683c-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=192&amp;id=ufbf02d19&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=525&amp;originWidth=519&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=19983&amp;status=done&amp;style=none&amp;taskId=uf0659e04-b153-466c-b27d-4a972fc1522&amp;title=&amp;width=190" alt="image.png"></p>
+<h2 id="5%E3%80%81%E7%BB%98%E5%88%B6%E5%9B%BE%E7%89%87" tabindex="-1">5、绘制图片</h2>
+<h3 id="ctx.drawimage" tabindex="-1">ctx.drawImage</h3>
+<p>绘制图片资源。有九个参数，分别为（img，sx， sy 截取图片起始坐标，sWidth，sHeight 截取图片的宽高， dx，dy 放置坐标，dWidth，dHeight 放置图片的大小）</p>
+<h1 id="6%E3%80%81%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C" tabindex="-1">6、其他操作</h1>
+<h2 id="1%E3%80%81%E8%AE%BE%E7%BD%AE%E9%80%8F%E6%98%8E%E5%BA%A6" tabindex="-1">1、设置透明度</h2>
+<h3 id="ctx.globalalpha" tabindex="-1">ctx.globalAlpha</h3>
+<p>取值为0~1，0为透明。</p>
+<h2 id="2%E3%80%81%E7%94%BB%E5%B8%83%E8%BD%AC%E7%A0%81" tabindex="-1">2、画布转码</h2>
+<p>Canvas元素的原型HTMLCanvasElement下的方法toDataURL()，该方法返回一个包含图片展示的 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">data URI</a>（base64编码） 。可以使用 type 参数其类型，默认为 <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a> 格式。图片的分辨率为96dpi。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> canvas = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;canvas&#x27;</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(canvas.<span class="hljs-title function_">toDataURL</span>())
+</code></pre>
+<h2 id="3%E3%80%81%E5%88%A4%E6%96%AD%E7%82%B9%E4%BD%8D" tabindex="-1">3、判断点位</h2>
+<h3 id="ctx.ispointinpath" tabindex="-1">ctx.isPointInPath</h3>
+<p>判断点位是否在已绘制区域内，有两个参数，分别为（x, y 检查点的坐标）</p>
+<h3 id="ctx.ispointinstroke" tabindex="-1">ctx.isPointInStroke</h3>
+<p>判断点位是否在路径线上，参数同上。</p>
+<h2 id="4%E3%80%81%E8%8E%B7%E5%8F%96%E7%94%BB%E5%B8%83%E5%8C%BA%E5%9F%9F%E8%B5%84%E6%BA%90" tabindex="-1">4、获取画布区域资源</h2>
+<h3 id="ctx.getimagedata%E3%80%81ctx.putimagedata" tabindex="-1">ctx.getImageData、ctx.putImageData</h3>
+<p>getImageData()获取区域内像素数据，有四个参数，分别为（sx，sy 被提取图形的坐标，sWidth，sHeight 被提取图形的宽高），返回值为ImageData对象，包含canvas给定的矩形图像数据。
+putImageData()将已有ImageData对象绘制到相应位置方法，有七个参数（img，dx，dy 绘制区域坐标，dirtyX（可选），dirtyY(可选) 设定获取源图像的坐标，dirtyWidth(可选)，dirtyHeight(可选) 设定获取源图像的宽高）</p>
+<pre><code class="hljs language-javascript">ctx.<span class="hljs-title function_">rect</span>(<span class="hljs-number">100</span>, <span class="hljs-number">100</span>, <span class="hljs-number">100</span>, <span class="hljs-number">100</span>)
+ctx.<span class="hljs-title function_">fill</span>()
+<span class="hljs-keyword">var</span> data = ctx.<span class="hljs-title function_">getImageData</span>(<span class="hljs-number">100</span>, <span class="hljs-number">100</span>, <span class="hljs-number">50</span>, <span class="hljs-number">50</span>)
+ctx.<span class="hljs-title function_">putImageData</span>(data, <span class="hljs-number">200</span>, <span class="hljs-number">200</span>, <span class="hljs-number">25</span>, <span class="hljs-number">25</span>, <span class="hljs-number">25</span>, <span class="hljs-number">25</span>)
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627829685689-843dbf59-f08d-46c9-bc69-c822571a1985.png#clientId=u7c2d382c-6bb2-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=213&amp;id=u31dcb593&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=569&amp;originWidth=567&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=8853&amp;status=done&amp;style=none&amp;taskId=u14813677-43b5-442d-8ad6-17d0fc5a9a6&amp;title=&amp;width=212.5" alt="image.png"></p>
+<h2 id="5%E3%80%81%E8%A3%81%E5%89%AA" tabindex="-1">5、裁剪</h2>
+<h3 id="ctx.clip" tabindex="-1">ctx.clip</h3>
+<p>以当前绘制路径进行剪切。</p>
+<pre><code class="hljs language-javascript">ctx.<span class="hljs-title function_">arc</span>(<span class="hljs-number">250</span>, <span class="hljs-number">250</span>, <span class="hljs-number">100</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span> * <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span>)
+ctx.<span class="hljs-title function_">clip</span>()
+ctx.<span class="hljs-title function_">fillRect</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">250</span>, <span class="hljs-number">250</span>)
+ctx.<span class="hljs-title function_">stroke</span>()
+</code></pre>
+<p>效果：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1627827227209-81ed519c-03b7-45f2-b76d-45e3d75faff5.png#clientId=u7c2d382c-6bb2-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=196&amp;id=Dtgla&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=573&amp;originWidth=572&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=16091&amp;status=done&amp;style=none&amp;taskId=uef7cb1b7-0fe2-4806-88f2-47437b01835&amp;title=&amp;width=196" alt="image.png"></p>
+<h2 id="6%E3%80%81%E8%AE%BE%E7%BD%AE%E5%9B%BE%E5%83%8F%E5%90%88%E6%88%90%E6%93%8D%E4%BD%9C%E7%B1%BB%E5%9E%8B" tabindex="-1">6、设置图像合成操作类型</h2>
+<h3 id="ctx.globalcompositeoperation" tabindex="-1">ctx.globalCompositeOperation</h3>
+<p>在图像重叠时，依据设定值进行对图像的设置。</p>
+<h1 id="7%E3%80%81window.requestanimationframe" tabindex="-1">7、window.requestAnimationFrame</h1>
+<p>告诉浏览器——你希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画。该方法需要传入一个回调函数作为参数，该回调函数会在浏览器下一次重绘之前执行。
+tips：若你想在浏览器下次重绘之前继续更新下一帧动画，那么回调函数自身必须再次调用window.requestAnimationFrame()
+当你准备更新动画时你应该调用此方法。这将使浏览器在下一次重绘之前调用你传入给该方法的动画函数(即你的回调函数)。回调函数执行次数通常是每秒60次，但在大多数遵循W3C建议的浏览器中，回调函数执行次数通常与浏览器屏幕刷新次数相匹配。为了提高性能和电池寿命，因此在大多数浏览器里，当requestAnimationFrame() 运行在后台标签页或者隐藏的<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/iframe">&lt;iframe&gt;</a> 里时，requestAnimationFrame() 会被暂停调用以提升性能和电池寿命。</p>
+
+</body>
+</html>

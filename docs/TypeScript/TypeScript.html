@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <p>JavaScript作为一门动态语言，其声明变量的方式非常灵活，如var、let、const、function等关键字，可声明不同类型的原始值或引用值（Number、String、Boolean等）。这一特性虽然有其便捷之处，但在如今庞大的项目工程中，规整、细致的变量声明、函数包装等要求是必不可少的，在多人使用或开发的模块中，通常都有着固定的参数和变量形式，此时JavaScript灵活的类型声明反而显得多余且难以预测。
+再来看看静态语言的好处，它可以在初始化变量时便规定好相应的参数类型，在函数的入参、返回值都有着规定的类型，IDE可根据静态语言的特性，给予开发者检测出变量类型或语法方面的错误的能力，更快的定位出错误之处，降低开发成本。前面提到，在庞大且规范的项目中，JavaScript的动态类型声明无法让开发人员在编写过程中获得更全面的类型错误提示，因此借鉴于静态语言的形式，<strong>TypeScript</strong>诞生了，它根据JavaScript的运作提供了一套类型系统，无需执行代码便可以检测出变量与目标声明类型是否一致，使得开发人员更快捷的定位出潜在的类型、语法错误等问题。</p>
+<h1 id="typescript%E7%BC%96%E8%AF%91" tabindex="-1">TypeScript编译</h1>
+<p>TypeScript为JavaScript提供了类型检测功能，并不意味着它可以像JavaScript一样被浏览器等运行环境解析执行，
+它需要被转换为JS代码才可运行，**tsc（TypeScript compiler）**提供了将TS转换为JS的功能，可以通过npm下载
+<code class="hljs">npm <span class="hljs-keyword">install</span> -g typescript</code>。现在可以在命令行执行<code class="hljs">tsc <span class="hljs-built_in">index</span>.<span class="hljs-keyword">ts</span></code>，将index.ts文件转换为index.js文件。因此我们可以在<code class="hljs"><span class="hljs-title">.ts</span></code>后缀的文件中编写TypeScript，享受TypeScript提供的类型检测系统，以及在执行<code class="hljs"><span class="hljs-attribute">tsc</span></code>命令转换为js代码时获得完整的报错。
+有时候我们可能需要通过<code class="hljs"><span class="hljs-attribute">tsc</span></code>指令编译<code class="hljs"><span class="hljs-title">.ts</span></code>文件以获取错误提示，而不想影响到已转换后的<code class="hljs"><span class="hljs-title">.js</span></code>文件，可以通过<code class="hljs"><span class="hljs-comment">--noEmitOnError</span></code>选项进行编译：</p>
+<pre><code class="hljs language-typescript">tsc --noEmitOnError index.<span class="hljs-property">ts</span>
+</code></pre>
+<h1 id="%E9%9D%99%E6%80%81%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%B5%8B" tabindex="-1">静态类型检测</h1>
+<blockquote>
+<p>参考：<a href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html">https://www.typescriptlang.org/docs/handbook/2/basic-types.html</a></p>
+</blockquote>
+<p>JavaScript的动态类型意味着开发人员可能会意外地将变量类型混淆，例如 ：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> message = <span class="hljs-string">&quot;hello!&quot;</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">message</span>) {
+  <span class="hljs-title function_">message</span>()
+}
+<span class="hljs-title function_">test</span>(message)
+</code></pre>
+<p>以上代码在编写时，IDE不会提示错误，显而易见<code class="hljs"><span class="hljs-keyword">message</span></code>是一个字符串类型的变量，不能作为函数执行，而这些错误都得在代码执行时（运行时错误）才能知晓，而TypeScript的静态类型检测可以在代码未执行的情况下检测出其中的类型错误并进行提示。无独有偶，通常我们会将各类数据及方法以对象形式存储，在JavaScript中，获取一个对象不存在的属性并不会报错，而是返回<code class="hljs"><span class="hljs-literal">undefined</span></code>，而我们很可能会错误的将一个本不存在的对象属性视为方法执行：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> obj = {
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;obj&#x27;</span>
+  <span class="hljs-title function_">func</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>)
+  }
+}
+obj.<span class="hljs-title function_">fun</span>() 
+</code></pre>
+<p>此时获取<code class="hljs">obj.<span class="hljs-keyword">fun</span></code>将会返回<code class="hljs"><span class="hljs-literal">undefined</span></code>，其执行的结果会报错，而这都将在运行时才能知晓，TypeScript的类型检测在此即可发挥作用，会在获取对象本身不存在的键时检测出错误：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> obj = {
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;obj&#x27;</span>,
+  <span class="hljs-title function_">func</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>)
+  }
+}
+obj.<span class="hljs-title function_">fun</span>() <span class="hljs-comment">// 属性“fun”在类型“{ name: string; func(): void; }”上不存在。你是否指的是“func”?</span>
+</code></pre>
+<p>以上的例子也是开发中常见的拼写错误而导致的问题，TypeScript能通过类型的不同检测出错误并提示，更多例子：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">flipCoin</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// 运算符“&lt;”不能应用于类型“() =&gt; number”和“number”。</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">random</span> &lt; <span class="hljs-number">0.5</span>; 
+}
+</code></pre>
+<p>TypeScript类型检查器有信息来检查我们是否访问了变量和其他属性的正确属性。一旦它有了这些信息，它还可以开始建议可能想要使用哪些属性，此特性应用于IDE中的代码补全功能，导航到引用等。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> announcement = <span class="hljs-string">&quot;Hello World!&quot;</span>;
+
+
+<span class="hljs-comment">// 属性“toLocaleLowercase”在类型“&quot;Hello World!&quot;”上不存在。你是否指的是“toLocaleLowerCase”?</span>
+announcement.<span class="hljs-title function_">toLocaleLowercase</span>();
+<span class="hljs-comment">// 属性“toLocalLowerCase”在类型“&quot;Hello World!&quot;”上不存在。你是否指的是“toLocaleLowerCase”?</span>
+announcement.<span class="hljs-title function_">toLocalLowerCase</span>(); 
+
+announcement.<span class="hljs-title function_">toLocaleLowerCase</span>(); <span class="hljs-comment">// 正确</span>
+</code></pre>
+<h2 id="%E6%98%BE%E7%A4%BA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B%EF%BC%88%E7%B1%BB%E5%9E%8B%E6%B3%A8%E8%A7%A3%EF%BC%89" tabindex="-1">显示定义类型（类型注解）</h2>
+<p>在执行函数时，我们可能传入了错误类型的参数，从而影响函数内部的执行，为避免潜在的运行时错误，我们可以在声明函数时为形参添加类型注解：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params">person: <span class="hljs-built_in">string</span>, date: <span class="hljs-built_in">Date</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hello <span class="hljs-subst">${person}</span>, today is <span class="hljs-subst">${date.toDateString()}</span>!`</span>);
+}
+ 
+<span class="hljs-title function_">greet</span>(<span class="hljs-string">&quot;Maddison&quot;</span>, <span class="hljs-title class_">Date</span>()); <span class="hljs-comment">// 类型“string”的参数不能赋给类型“Date”的参数。此处Date()的执行结果返回字符串类型</span>
+</code></pre>
+<p>如上，在函数传参时，TypeScript检测出了不符合类型的入参并进行提示。</p>
+<h2 id="%E7%B1%BB%E5%9E%8B%E6%8E%A8%E6%96%AD" tabindex="-1">类型推断</h2>
+<p>TypeScript可以根据我们声明的变量推断出其类型，即使我们没有显示的注解类型：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">let</span> message = <span class="hljs-string">&quot;hello&quot;</span>
+<span class="hljs-comment">// 将鼠标置于message上，会提示 &quot;let message: string&quot;</span>
+</code></pre>
+<p>这是TypeScript的一种特性，如果能依靠类型系统推断出最终我们需要的变量类型，便可以省略类型注解从而提高开发效率。</p>
+<h2 id="%E4%BB%A3%E7%A0%81%E9%99%8D%E7%BA%A7" tabindex="-1">代码降级</h2>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params">person: <span class="hljs-built_in">string</span>, date: <span class="hljs-built_in">Date</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hello <span class="hljs-subst">${person}</span>, today is <span class="hljs-subst">${date.toDateString()}</span>!`</span>);
+}
+ 
+<span class="hljs-title function_">greet</span>(<span class="hljs-string">&quot;Maddison&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>());
+</code></pre>
+<p>以上代码通过<code class="hljs"><span class="hljs-attribute">tsc</span></code>命令的编译结果为</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params">person, date</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Hello &quot;</span>.<span class="hljs-title function_">concat</span>(person, <span class="hljs-string">&quot;, today is &quot;</span>).<span class="hljs-title function_">concat</span>(date.<span class="hljs-title function_">toDateString</span>(), <span class="hljs-string">&quot;!&quot;</span>));
+}
+<span class="hljs-title function_">greet</span>(<span class="hljs-string">&quot;Maddison&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>());
+</code></pre>
+<p>编译后的<code class="hljs"><span class="hljs-title">.js</span></code>文件内，属于ES6的模板字符串写法<code class="hljs">$<span class="hljs-meta">{...}</span></code>被转换为了<code class="hljs"><span class="hljs-type">String</span>.proto<span class="hljs-keyword">type</span>.concat</code>这一ES3即存在的方法，以提供更好的兼容性，这一现象称为降级，默认会降级到ES3。如果想要避免TypeScript的代码降级，或者指定降级的ECMAScript版本，可以通过<code class="hljs">tsc <span class="hljs-attr">--target</span> (版本)</code>命令，<code class="hljs">etc: tsc --<span class="hljs-keyword">target</span> es2015 <span class="hljs-built_in">index</span>.ts</code>。</p>
+<h2 id="%E4%B8%A5%E6%A0%BC%E6%A8%A1%E5%BC%8F" tabindex="-1">严格模式</h2>
+<p>很多时候我们是从JavaScript项目迁移到TypeScript项目，为方便迁移，TypeScript默认不开启严格模式，即不会将没有明确指定类型的变量（TypeScript将指定其为<code class="hljs"><span class="hljs-built_in">any</span></code>类型）在执行<code class="hljs"><span class="hljs-attribute">tsc</span></code>命令转换时报错，也不会将潜在的可能对于<code class="hljs"><span class="hljs-literal">null</span>/<span class="hljs-literal">undefined</span></code>进行取值的操作或类型注解与<code class="hljs"><span class="hljs-literal">null</span>/<span class="hljs-literal">undefined</span></code>不符进行报错，例如：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fn</span>(<span class="hljs-params">s</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(s.<span class="hljs-title function_">subtr</span>(<span class="hljs-number">3</span>));
+}
+<span class="hljs-title function_">fn</span>(<span class="hljs-number">42</span>);
+<span class="hljs-comment">// fn的参数s没有类型注解，故为any类型，TypeScript默认不会进行报错</span>
+</code></pre>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">var</span> arr = [
+  { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;Oby&quot;</span>, <span class="hljs-attr">age</span>: <span class="hljs-number">12</span> },
+  { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;Heera&quot;</span>, <span class="hljs-attr">age</span>: <span class="hljs-number">32</span> },
+];
+<span class="hljs-keyword">const</span> obj = arr.<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item.<span class="hljs-property">age</span> &gt; <span class="hljs-number">32</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(obj.<span class="hljs-property">name</span>) 
+<span class="hljs-comment">// 此处obj对象在执行时为undefined，显然会报错，但TypeScript默认在检测时不会对潜在的undefined类型进行取值的报错</span>
+</code></pre>
+<p>以上两种代码在未开启严格模式的情况下执行<code class="hljs"><span class="hljs-attribute">tsc</span></code>命令不会提示错误，而这两种代码显然存在潜在的类型错误问题，在开启了严格模式后，TypeScript将会提示出错误。即时以上两种代码在条件正确的情况下进行转换，TypeScript也会提出错误，这也体现了TypeScript并不会执行代码，而是作为一种类型检测系统，排除出所有可能潜在的类型语法错误问题，辅助开发人员进行工作。
+开启严格模式的可以通过<code class="hljs">tsconfig.json</code>进行配置<code class="hljs"><span class="hljs-attr">&quot;strict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">true</span></code>，也可以在执行<code class="hljs"><span class="hljs-attribute">tsc</span></code>命令时添加<code class="hljs"><span class="hljs-comment">--strict</span></code>标识。开启了严格模式后，会启用两个配置项：<code class="hljs"><span class="hljs-attribute">noImplicitAny</span></code>和<code class="hljs"><span class="hljs-attribute">strictNullChecks</span></code>，分别是对于上述两种代码问题的规避，即不允许<code class="hljs"><span class="hljs-built_in">any</span></code>类型的值（允许注解为<code class="hljs"><span class="hljs-built_in">any</span></code>的值）和对可能存在<code class="hljs"><span class="hljs-literal">null</span>/<span class="hljs-literal">undefined</span></code>的相关行为进行检测。</p>
+<h1 id="%E7%B1%BB%E5%9E%8B%E7%9B%B8%E5%85%B3" tabindex="-1">类型相关</h1>
+<blockquote>
+<p>参考：<a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html">https://www.typescriptlang.org/docs/handbook/2/everyday-types.html</a></p>
+</blockquote>
+<p>在TypeScript类型系统中，有着完善的描述JavaScript中类型的手段。在前面的代码演示中我们采取过类型注解对类型进行定义，其实还有更多定义类型的方法等待我们探索，在此之前先概括一下TypeScript中存在的类型。</p>
+<h2 id="%E7%B1%BB%E5%9E%8B" tabindex="-1">类型</h2>
+<p>TypeScript中可能存在的类型：</p>
+<ul>
+<li>string</li>
+</ul>
+<p>如JavaScript中的字符串类型String。</p>
+<ul>
+<li>number</li>
+</ul>
+<p>如JavaScript中的数值类型Number，没有明确的整型和浮动型的区分。</p>
+<ul>
+<li>boolean</li>
+</ul>
+<p>如JavaScript中的布尔类型Boolean。</p>
+<ul>
+<li>Array</li>
+</ul>
+<p>在TypeScript中，描述一个数组可以通过如<code class="hljs"><span class="hljs-built_in">number</span>[]</code>或<code class="hljs"><span class="hljs-built_in">Array</span>&lt;<span class="hljs-built_in">number</span>&gt;</code>的形式，描述一个包含相对应类型值的数组。</p>
+<ul>
+<li>any</li>
+</ul>
+<p>TypeScript中的特有类型，可以在描述没有明确类型的值时使用，可以对其进行各种操作而不会触发TypeScript类型检测错误。</p>
+<ul>
+<li>Function</li>
+</ul>
+<p>在TypeScript中，我们可以对函数的形参及返回值进行类型注解。</p>
+<ul>
+<li>Object</li>
+</ul>
+<p>在TypeScript中，对象可以集合以上所有类型的值。</p>
+<h2 id="%E7%B1%BB%E5%9E%8B%E6%B3%A8%E8%A7%A3%E5%92%8C%E7%B1%BB%E5%9E%8B%E6%8E%A8%E6%96%AD" tabindex="-1">类型注解和类型推断</h2>
+<p>我们可以在声明一个变量的同时为其添加注解：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">let</span> <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span> = <span class="hljs-string">&#x27;TypeScript&#x27;</span>
+</code></pre>
+<p>在上面的代码中，即使我们没有手动的添加注解，TypeScript也会自动的检测推断出<code class="hljs"><span class="hljs-keyword">name</span></code>变量的类型为<code class="hljs"><span class="hljs-built_in">string</span></code>，所以我们在声明变量和变量赋值时可以尽量地利用TypeScript的类型推断以减少我们的代码量。
+而对于函数来说，TypeScript无法推断出形参所对应的类型（但是会自动地检测实参与形参数量是否相符以避免更多风险），所以需要我们手动的进行类型注解：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// 对形参进行注解</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params">name: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Hello, &quot;</span> + name.<span class="hljs-title function_">toUpperCase</span>() + <span class="hljs-string">&quot;!!&quot;</span>);
+}
+
+<span class="hljs-title function_">greet</span>(<span class="hljs-number">42</span>);
+<span class="hljs-comment">// 此时TypeScript会检测出实参类型的错误并进行提示</span>
+
+<span class="hljs-comment">// 对函数返回值进行注解</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getFavoriteNumber</span>(<span class="hljs-params"></span>): <span class="hljs-built_in">number</span> {
+  <span class="hljs-keyword">return</span> <span class="hljs-number">26</span>;
+}
+</code></pre>
+<p>如同原始值类型注解一样，TypeScript可以根据返回值自动注解函数的返回值类型。</p>
+<h2 id="%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%E7%9A%84%E7%B1%BB%E5%9E%8B%E6%8E%A8%E6%96%AD" tabindex="-1">匿名函数的类型推断</h2>
+<p>匿名函数如果能够明确其绑定的上下文环境，便可以自动推断出其入参和返回值的类型。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> names = [<span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-string">&quot;Bob&quot;</span>, <span class="hljs-string">&quot;Eve&quot;</span>];
+
+names.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">s</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(s.<span class="hljs-title function_">toUppercase</span>());
+  <span class="hljs-comment">// Property &#x27;toUppercase&#x27; does not exist on type &#x27;string&#x27;. Did you mean &#x27;toUpperCase&#x27;?</span>
+});
+
+names.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">s</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(s.<span class="hljs-title function_">toUppercase</span>());
+  <span class="hljs-comment">// Property &#x27;toUppercase&#x27; does not exist on type &#x27;string&#x27;. Did you mean &#x27;toUpperCase&#x27;?</span>
+});
+
+<span class="hljs-comment">// 函数声明则无法推断出类型</span>
+<span class="hljs-keyword">var</span> upperCase = <span class="hljs-keyword">function</span>(<span class="hljs-params">s</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(s.<span class="hljs-title function_">toUppercase</span>());
+}
+names.<span class="hljs-title function_">forEach</span>(upperCase) <span class="hljs-comment">// 将不会像以上匿名函数一样提示错误</span>
+</code></pre>
+<p>以上的匿名函数会根据<code class="hljs"><span class="hljs-attribute">names</span></code>数组中的类型推断出形参类型并提示存在的问题。这一点有别于函数声明。</p>
+<h2 id="%E5%AF%B9%E8%B1%A1%E7%9A%84%E7%B1%BB%E5%9E%8B%E6%B3%A8%E8%A7%A3" tabindex="-1">对象的类型注解</h2>
+<p>对象可以有许多类型的值组成，类型注解以<code class="hljs">{ key: <span class="hljs-keyword">type</span> }</code>进行表示，它还可以将一个键值设定为可选的：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">printName</span>(<span class="hljs-params">obj: { first: <span class="hljs-built_in">string</span>; last?: <span class="hljs-built_in">string</span> }</span>) {
+  <span class="hljs-comment">// ...</span>
+}
+<span class="hljs-comment">// Both OK</span>
+<span class="hljs-title function_">printName</span>({ <span class="hljs-attr">first</span>: <span class="hljs-string">&quot;Bob&quot;</span> });
+<span class="hljs-title function_">printName</span>({ <span class="hljs-attr">first</span>: <span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-attr">last</span>: <span class="hljs-string">&quot;Alisson&quot;</span> });
+</code></pre>
+<h2 id="%E8%81%94%E5%90%88%E7%B1%BB%E5%9E%8B" tabindex="-1">联合类型</h2>
+<p>TypeScript提供了一些操作符，以供我们基于已有类型结合使用以表示更多类型。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">printId</span>(<span class="hljs-params">id: <span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Your ID is: &quot;</span> + id);
+}
+<span class="hljs-comment">// OK</span>
+<span class="hljs-title function_">printId</span>(<span class="hljs-number">101</span>);
+<span class="hljs-comment">// OK</span>
+<span class="hljs-title function_">printId</span>(<span class="hljs-string">&quot;202&quot;</span>);
+<span class="hljs-comment">// Error</span>
+<span class="hljs-title function_">printId</span>({ <span class="hljs-attr">myID</span>: <span class="hljs-number">22342</span> });
+</code></pre>
+<p>以上代码使用了联合类型，注解了<code class="hljs"><span class="hljs-built_in">id</span></code>变量可以为<code class="hljs"><span class="hljs-built_in">number</span></code>或者<code class="hljs"><span class="hljs-built_in">string</span></code>类型。但是TypeScript不允许我们使用只存在于其中一种类型上（或类型的原型上）的方法：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">printId</span>(<span class="hljs-params">id: <span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(id.<span class="hljs-title function_">toUpperCase</span>());
+  <span class="hljs-comment">// Property &#x27;toUpperCase&#x27; does not exist on type &#x27;string | number&#x27;.</span>
+  <span class="hljs-comment">// Property &#x27;toUpperCase&#x27; does not exist on type &#x27;number&#x27;.</span>
+}
+
+<span class="hljs-comment">// 解决方法</span>
+<span class="hljs-comment">// 将两种可能的类型值分开处理</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">printId</span>(<span class="hljs-params">id: <span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> id === <span class="hljs-string">&quot;string&quot;</span>) {
+    <span class="hljs-comment">// In this branch, id is of type &#x27;string&#x27;</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(id.<span class="hljs-title function_">toUpperCase</span>());
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// Here, id is of type &#x27;number&#x27;</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(id);
+  }
+}
+</code></pre>
+<h2 id="%E7%B1%BB%E5%9E%8B%E5%88%AB%E5%90%8D" tabindex="-1">类型别名</h2>
+<p>有时候我们需要在多个地方应用到相同的类型（尤其是对象类型或联合类型），TypeScript允许将其抽离为一个固定的类名，从而可以在多个相同的类型注解引用它，这一形式成为类型别名。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">Point</span> = {
+  <span class="hljs-attr">x</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">y</span>: <span class="hljs-built_in">number</span>;
+};
+<span class="hljs-keyword">type</span> <span class="hljs-variable constant_">ID</span> = <span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span>;
+<span class="hljs-comment">// 还可以将类型别名像变量一样进行赋值给另一类型别名</span>
+<span class="hljs-keyword">type</span> name = <span class="hljs-variable constant_">ID</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">printCoord</span>(<span class="hljs-params">pt: Point, id: ID</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;The coordinate&#x27;s x value is &quot;</span> + pt.<span class="hljs-property">x</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;The coordinate&#x27;s y value is &quot;</span> + pt.<span class="hljs-property">y</span>);
+}
+ 
+<span class="hljs-title function_">printCoord</span>({ <span class="hljs-attr">x</span>: <span class="hljs-number">100</span>, <span class="hljs-attr">y</span>: <span class="hljs-number">100</span> }, <span class="hljs-string">&#x27;1&#x27;</span>);
+</code></pre>
+<h2 id="interfaces(%E6%8E%A5%E5%8F%A3)" tabindex="-1">Interfaces(接口)</h2>
+<p><code class="hljs"><span class="hljs-keyword">interface</span></code>也可以声明一个对象类型：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Point</span> {
+  <span class="hljs-attr">x</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">y</span>: <span class="hljs-built_in">number</span>;
+}
+ 
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">printCoord</span>(<span class="hljs-params">pt: Point</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;The coordinate&#x27;s x value is &quot;</span> + pt.<span class="hljs-property">x</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;The coordinate&#x27;s y value is &quot;</span> + pt.<span class="hljs-property">y</span>);
+}
+ 
+<span class="hljs-title function_">printCoord</span>({ <span class="hljs-attr">x</span>: <span class="hljs-number">100</span>, <span class="hljs-attr">y</span>: <span class="hljs-number">100</span> });
+</code></pre>
+<h2 id="type%E4%B8%8Einterface%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB" tabindex="-1"><code class="hljs"><span class="hljs-keyword">type</span></code>与<code class="hljs"><span class="hljs-keyword">Interface</span></code>之间的区别</h2>
+<p>前面提到，类型别名与Interface都可以用来声明对象类型，但在命名与扩展类型方面两者的表现有所差异：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// 接口继承是一种贴近oop的实现方式，更加明了的对类型进行扩展</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Animal</span> {
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>
+}
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Bear</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Animal</span> {
+  <span class="hljs-attr">honey</span>: <span class="hljs-built_in">boolean</span>
+}
+
+<span class="hljs-keyword">const</span> bear = <span class="hljs-title function_">getBear</span>() 
+bear.<span class="hljs-property">name</span>
+bear.<span class="hljs-property">honey</span>
+
+<span class="hljs-comment">// 类型别名像是两个变量进行结合</span>
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Animal</span> = {
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>
+}
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Bear</span> = <span class="hljs-title class_">Animal</span> &amp; { 
+  <span class="hljs-attr">honey</span>: <span class="hljs-built_in">boolean</span> 
+}
+
+<span class="hljs-keyword">const</span> bear = <span class="hljs-title function_">getBear</span>();
+bear.<span class="hljs-property">name</span>;
+bear.<span class="hljs-property">honey</span>;
+</code></pre>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// Interface允许名称重复，TypeScript会将重复名称的接口进行合并</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Window</span> {
+  <span class="hljs-attr">title</span>: <span class="hljs-built_in">string</span>
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Window</span> {
+  <span class="hljs-attr">ts</span>: <span class="hljs-title class_">TypeScriptAPI</span>
+}
+
+<span class="hljs-keyword">const</span> src = <span class="hljs-string">&#x27;const a = &quot;Hello World&quot;&#x27;</span>;
+<span class="hljs-variable language_">window</span>.<span class="hljs-property">ts</span>.<span class="hljs-title function_">transpileModule</span>(src, {});
+
+<span class="hljs-comment">// 类型别名不允许重复的名称</span>
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Window</span> = {
+  <span class="hljs-attr">title</span>: <span class="hljs-built_in">string</span>
+}
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Window</span> = {
+  <span class="hljs-attr">ts</span>: <span class="hljs-title class_">TypeScriptAPI</span>
+}
+
+<span class="hljs-comment">// Error: Duplicate identifier &#x27;Window&#x27;.</span>
+</code></pre>
+<p>除此以外，还有些细微的差异：</p>
+<ul>
+<li>类型别名可以定义原始值类型，接口只能定义对象类型</li>
+<li>在检测到类型错误时，接口名会出现在错误提示中</li>
+</ul>
+<h2 id="%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80" tabindex="-1">类型断言</h2>
+<p>TypeScript并非能准确的推断出每一个值的类型，例如对于<code class="hljs"><span class="hljs-built_in">document</span>.getElementById()</code>，TypeScript只知道该方法会返回<code class="hljs"><span class="hljs-attribute">HTMLElement</span></code>类型的值， 而无法确认其他返回类型如：<code class="hljs"><span class="hljs-attribute">HTMLCanvasElement</span></code>、<code class="hljs"><span class="hljs-attribute">HTMLDivElement</span></code>等，若我们想要指定相对应类型的值以进行更详细的类型检测，可以使用类型断言：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// 第2行代码将会推断为HTMLElement类型，与getCanvas方法形参类型不一致</span>
+<span class="hljs-comment">// var canvas = document.getElementById(&#x27;canvas&#x27;)</span>
+<span class="hljs-keyword">var</span> canvas = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;canvas&#x27;</span>) <span class="hljs-keyword">as</span> <span class="hljs-title class_">HTMLCanvasElement</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getcanvas</span>(<span class="hljs-params">canvas: HTMLCanvasElement</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(canvas)
+}
+<span class="hljs-title function_">getcanvas</span>(canvas)
+
+<span class="hljs-comment">// 还可以使用&lt;&gt;语法</span>
+<span class="hljs-keyword">var</span> canvas = &lt;<span class="hljs-title class_">HTMLCanvasElement</span>&gt; <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;canvas&#x27;</span>)
+</code></pre>
+<p>如同类型注解一样，类型断言将在编译环节被移除，意味着它不会出现在最终代码中。
+类型断言只允许将一种类型转化为更具体或更宽泛的类型（可以理解为转化为处于同一原型链上的类型）：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> x = <span class="hljs-string">&quot;hello&quot;</span> <span class="hljs-keyword">as</span> <span class="hljs-built_in">number</span>;
+<span class="hljs-comment">//Conversion of type &#x27;string&#x27; to type &#x27;number&#x27; may be a mistake because </span>
+<span class="hljs-comment">// neither type sufficiently overlaps with the other. </span>
+<span class="hljs-comment">// If this was intentional, convert the expression to &#x27;unknown&#x27; first.</span>
+</code></pre>
+<p>如果需要解除这一限制，可以利用两个类型断言：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> x = (str <span class="hljs-keyword">as</span> <span class="hljs-built_in">any</span>) <span class="hljs-keyword">as</span> <span class="hljs-built_in">number</span>;
+</code></pre>
+<h2 id="literal-types%EF%BC%88%E5%AD%97%E9%9D%A2%E9%87%8F%E7%B1%BB%E5%9E%8B%EF%BC%89" tabindex="-1">Literal Types（字面量类型）</h2>
+<p>除了<code class="hljs"><span class="hljs-built_in">number</span></code>和<code class="hljs"><span class="hljs-built_in">string</span></code>等常用类型以外，我们还可以使用特定的字面量（如一串数字或字符）来作为类型引用。这一特性体现在<code class="hljs"><span class="hljs-keyword">const</span></code>声明的变量上，因为其声明的变量值是不可更改的，即类型固定的：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>
+<span class="hljs-comment">// 此时将鼠标置于a变量上，会提示变量a的类型为1</span>
+<span class="hljs-keyword">const</span> b = <span class="hljs-string">&#x27;string b&#x27;</span>
+<span class="hljs-comment">// 变量b的类型为&quot;string b&quot;</span>
+</code></pre>
+<p>上面代码似乎没有体现出字面量类型的作用，来看看下面的代码：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">whereAreYouGo</span>(<span class="hljs-params">direction: <span class="hljs-string">&quot;left&quot;</span> | <span class="hljs-string">&quot;straight&quot;</span> | <span class="hljs-string">&quot;right&quot;</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Ok, you will go&#x27;</span> + direction);
+}
+<span class="hljs-keyword">var</span> direction = <span class="hljs-string">&#x27;back&#x27;</span>
+<span class="hljs-title function_">whereAreYouGo</span>(direction) 
+<span class="hljs-comment">// Argument of type &#x27;string&#x27; is not assignable to parameter of type &#x27;&quot;left&quot; | &quot;right&quot; | &quot;straight&quot;&#x27;.</span>
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">compare</span>(<span class="hljs-params">a: <span class="hljs-built_in">string</span>, b: <span class="hljs-built_in">string</span></span>): -<span class="hljs-number">1</span> | <span class="hljs-number">0</span> | <span class="hljs-number">1</span> {
+  <span class="hljs-keyword">return</span> a === b ? <span class="hljs-number">0</span> : a &gt; b ? <span class="hljs-number">1</span> : -<span class="hljs-number">1</span>;
+}
+</code></pre>
+<p>可以看出，字面量类型可以如同类型一样进行类型注解，只有相同字面量类型才可以通过检测。TypeScript可以根据字面量类型结合类型推断进行更准确的类型检测。 字面量类型也可以结合其他类型一起进行类型注解。</p>
+<h2 id="literal-inference%EF%BC%88%E5%AD%97%E9%9D%A2%E9%87%8F%E6%8E%A8%E6%96%AD%EF%BC%89" tabindex="-1">Literal Inference（字面量推断）</h2>
+<p>在JavaScript中，<code class="hljs"><span class="hljs-keyword">const</span></code>声明的对象中键值是可变的，所以TypeScript不会将其中的键值对推断为字面量类型，而是根据每个键值对推断出相应类型，稍加不注意就会引起下面的错误：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> req = { <span class="hljs-attr">url</span>: <span class="hljs-string">&quot;https://example.com&quot;</span>, <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;GET&quot;</span> };
+<span class="hljs-title function_">handleRequest</span>(req.<span class="hljs-property">url</span>, req.<span class="hljs-property">method</span>);
+<span class="hljs-comment">// Argument of type &#x27;string&#x27; is not assignable to parameter of type &#x27;&quot;GET&quot; | &quot;POST&quot;&#x27;.</span>
+<span class="hljs-comment">// req.method的类型推断为string</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">handleRequest</span>(<span class="hljs-params">url: <span class="hljs-built_in">string</span>, method: <span class="hljs-string">&quot;GET&quot;</span> | <span class="hljs-string">&quot;POST&quot;</span></span>) {
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>以上的错误可以以两种形式规避：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-attr">way1</span>:
+  <span class="hljs-comment">// Change 1:</span>
+  <span class="hljs-keyword">const</span> req = { <span class="hljs-attr">url</span>: <span class="hljs-string">&quot;https://example.com&quot;</span>, <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;GET&quot;</span> <span class="hljs-keyword">as</span> <span class="hljs-string">&quot;GET&quot;</span> };
+  <span class="hljs-comment">// Change 2</span>
+  <span class="hljs-title function_">handleRequest</span>(req.<span class="hljs-property">url</span>, req.<span class="hljs-property">method</span> <span class="hljs-keyword">as</span> <span class="hljs-string">&quot;GET&quot;</span>);
+
+way <span class="hljs-number">2</span>:
+  <span class="hljs-keyword">const</span> req = { <span class="hljs-attr">url</span>: <span class="hljs-string">&quot;https://example.com&quot;</span>, <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;GET&quot;</span> } <span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span>;
+  <span class="hljs-title function_">handleRequest</span>(req.<span class="hljs-property">url</span>, req.<span class="hljs-property">method</span>);
+</code></pre>
+<p>第二种方法中的<code class="hljs"><span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span></code>后缀，可以确保将声明的对象（即使为let、var声明的对象）中的键值推断为字面量类型。</p>
+<h2 id="null%E4%B8%8Eundefined" tabindex="-1">null与undefined</h2>
+<p>在JavaScript中，<code class="hljs"><span class="hljs-literal">null</span></code>与<code class="hljs"><span class="hljs-literal">undefined</span></code>用于表示空值或未初始化的值，TypeScript中也有相应的值。可以根据<code class="hljs"><span class="hljs-attribute">strictNullChecks</span></code>选项以获得<code class="hljs"><span class="hljs-literal">null</span></code>与<code class="hljs"><span class="hljs-literal">undefined</span></code>的不同表现，当<code class="hljs"><span class="hljs-attribute">strictNullChecks</span></code>选项为<code class="hljs"><span class="hljs-literal">true</span></code>时，TypeScript要求对于<code class="hljs"><span class="hljs-literal">null</span></code>和<code class="hljs"><span class="hljs-literal">undefined</span></code>值进行边缘处理以免产生不可预期的错误：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// error</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">doSomething</span>(<span class="hljs-params">x: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span></span>) 
+   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Hello, &quot;</span> + x.<span class="hljs-title function_">toUpperCase</span>());
+}
+<span class="hljs-comment">// 在strictNullChecks为true的情况下，不允许以上代码通过编译，因为x的值可能为null，此时第3行的代码将执行错误。</span>
+
+<span class="hljs-comment">// correct</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">doSomething</span>(<span class="hljs-params">x: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span></span>) {
+  <span class="hljs-keyword">if</span> (x === <span class="hljs-literal">null</span>) {
+    <span class="hljs-comment">// do nothing</span>
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Hello, &quot;</span> + x.<span class="hljs-title function_">toUpperCase</span>());
+  }
+}
+</code></pre>
+<p>可以使用<code class="hljs"><span class="hljs-addition">!</span></code>后缀来表示一个值不会为<code class="hljs"><span class="hljs-literal">null</span></code>或<code class="hljs"><span class="hljs-literal">undefined</span></code>类型：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">liveDangerously</span>(<span class="hljs-params">x?: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span></span>) {
+  <span class="hljs-comment">// No error</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x!.<span class="hljs-title function_">toFixed</span>());
+  <span class="hljs-comment">// 断言x不会为null或undefined</span>
+}
+
+<span class="hljs-comment">// 一个更直观的例子：</span>
+<span class="hljs-keyword">var</span> res = [
+  {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;1&#x27;</span>,
+    <span class="hljs-attr">age</span>: <span class="hljs-number">1</span>
+  },
+  {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;2&#x27;</span>,
+    <span class="hljs-attr">age</span>: <span class="hljs-number">2</span>
+  },
+  {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;3&#x27;</span>,
+    <span class="hljs-attr">age</span>: <span class="hljs-number">3</span>
+  }
+].<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item.<span class="hljs-property">age</span> &gt; <span class="hljs-number">2</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res!.<span class="hljs-property">name</span>)
+<span class="hljs-comment">// 不对res添加!断言的话，TypeScript将会在strictNullChecks为true时进行报错，提示可能存在对null或undefined的取值操作</span>
+<span class="hljs-comment">// 添加!断言该值不会为null或undefined</span>
+</code></pre>
+<h1 id="%E7%B1%BB%E5%9E%8B%E8%8C%83%E5%9B%B4%E7%BC%A9%E5%B0%8F" tabindex="-1">类型范围缩小</h1>
+<blockquote>
+<p>参考：<a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking">https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking</a></p>
+</blockquote>
+<p>TypeScript中可以根据条件判断等行为对一个值的类型进行收窄，即认定其最终类型，例子如下：
+假设我们有一个需求：定义一个<code class="hljs"><span class="hljs-attribute">padLeft</span></code>方法，当提供的<code class="hljs"><span class="hljs-attribute">padding</span></code>参数为数值时，则为<code class="hljs"><span class="hljs-selector-tag">input</span></code>参数的字符串的左侧添加相应数量的空格，若<code class="hljs"><span class="hljs-attribute">padding</span></code>为字符串，则为<code class="hljs"><span class="hljs-selector-tag">input</span></code>参数的左侧添加该字符串。
+观察这个需求，我们可以得知padding有两种可能性：<code class="hljs"><span class="hljs-built_in">string</span></code>类型和<code class="hljs"><span class="hljs-built_in">number</span></code>类型。当添加了<code class="hljs"><span class="hljs-function"><span class="hljs-title">if</span><span class="hljs-params">(typeof padding = <span class="hljs-string">&quot;number&quot;</span>)</span></span></code>后，TypeScript可以此判断出该<code class="hljs"><span class="hljs-attribute">if</span></code>语句内使用的<code class="hljs"><span class="hljs-attribute">padding</span></code>为<code class="hljs"><span class="hljs-built_in">number</span></code>类型，<code class="hljs"><span class="hljs-attribute">if</span></code>语句外使用的<code class="hljs"><span class="hljs-attribute">padding</span></code>则为<code class="hljs"><span class="hljs-built_in">string</span></code>类型，这一现象便称为<strong>类型范围缩小。</strong>
+<strong>类型范围缩小</strong>是TypeScript针对联合类型做出处理，以更明确的判断出值类型。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">padLeft</span>(<span class="hljs-params">padding: <span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span>, input: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">&quot; &quot;</span>.<span class="hljs-title function_">repeat</span>(padding) + input;
+  <span class="hljs-comment">//Argument of type &#x27;string | number&#x27; is not assignable to parameter of type &#x27;number&#x27;.</span>
+  <span class="hljs-comment">//Type &#x27;string&#x27; is not assignable to type &#x27;number&#x27;.</span>
+}
+
+<span class="hljs-comment">// 在添加了对padding是否为数值类型的判断后，可以明确出两种返回情况中的padding值分别为何种类型</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">padLeft</span>(<span class="hljs-params">padding: <span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span>, input: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> padding === <span class="hljs-string">&quot;number&quot;</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot; &quot;</span>.<span class="hljs-title function_">repeat</span>(padding) + input; <span class="hljs-comment">// TypeScript推断出padding为number类型</span>
+  }
+  <span class="hljs-keyword">return</span> padding + input; <span class="hljs-comment">// TypeScript推断出padding为string类型</span>
+}
+</code></pre>
+<h2 id="%E7%B1%BB%E5%9E%8B%E5%AE%88%E5%8D%ABtypeof" tabindex="-1">类型守卫<code class="hljs"><span class="hljs-keyword">typeof</span></code></h2>
+<p>typeof在TypeScript中，typeof可以作为类型守卫，依据其判断的结果来告知TypeScript相对应值的类型。
+可以判断的类型如同JavaScript：</p>
+<ul>
+<li>string</li>
+<li>number</li>
+<li>boolean</li>
+<li>object</li>
+<li>function</li>
+<li>undefined</li>
+<li>symbol</li>
+<li>bigint</li>
+</ul>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">printAll</span>(<span class="hljs-params">strs: <span class="hljs-built_in">string</span> | <span class="hljs-built_in">string</span>[] | <span class="hljs-literal">null</span></span>) {
+   <span class="hljs-comment">// 需要注意的是在JavaScript中，typeof null的结果为object，固因增加限制</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> strs === <span class="hljs-string">&quot;object&quot;</span> &amp;&amp; strs != <span class="hljs-literal">null</span>) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> s <span class="hljs-keyword">of</span> strs) {
+      <span class="hljs-comment">// Object is possibly &#x27;null&#x27;.</span>
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(s);
+    }
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> strs === <span class="hljs-string">&quot;string&quot;</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(strs);
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// do nothing</span>
+  }
+}
+</code></pre>
+<h2 id="%E4%BE%9D%E6%8D%AE%E7%9C%9F%E5%80%BC%E7%BC%A9%E5%B0%8F%E7%B1%BB%E5%9E%8B%E8%8C%83%E5%9B%B4" tabindex="-1">依据真值缩小类型范围</h2>
+<p>如前面的<code class="hljs"><span class="hljs-keyword">typeof</span></code>所示，TypeScript可以根据<code class="hljs"><span class="hljs-keyword">typeof</span></code>语句返回的结果（非<code class="hljs"><span class="hljs-literal">true</span></code>即<code class="hljs"><span class="hljs-literal">false</span></code>），结合<code class="hljs"><span class="hljs-attribute">if</span></code>语句对于类型进行缩小。另外也可以直接对值进行判断从而缩小类型：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">keys</span>(<span class="hljs-params">value: <span class="hljs-built_in">number</span>[] | <span class="hljs-literal">null</span></span>) {
+  <span class="hljs-keyword">if</span> (value) {
+    value.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item)) <span class="hljs-comment">// TypeScript判断value为数组</span>
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;value is not an Array&#x27;</span>)
+  }
+}
+</code></pre>
+<h2 id="%E4%BE%9D%E6%8D%AE%E5%80%BC%E6%AF%94%E8%BE%83%E7%BC%A9%E5%B0%8F%E7%B1%BB%E5%9E%8B%E8%8C%83%E5%9B%B4" tabindex="-1">依据值比较缩小类型范围</h2>
+<p>当两个值的联合类型具有重叠部分时，我们可以依据该重叠部分作出判断，可运用<code class="hljs"><span class="hljs-keyword">switch</span></code>语句或者比较运算符<code class="hljs">===、!==、==、!=</code>判断（个人认为<code class="hljs"><span class="hljs-operator">=</span><span class="hljs-operator">=</span></code>和<code class="hljs"><span class="hljs-addition">!=</span></code>运算符不应作为类型判断的依据，因为这种判断没有严格遵守类型）：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">example</span>(<span class="hljs-params">x: <span class="hljs-built_in">string</span> | <span class="hljs-built_in">number</span>, y: <span class="hljs-built_in">string</span> | <span class="hljs-built_in">boolean</span></span>) {
+  <span class="hljs-keyword">if</span> (x === y) { <span class="hljs-comment">// 判断出x和y皆为string类型</span>
+    <span class="hljs-comment">// We can now call any &#x27;string&#x27; method on &#x27;x&#x27; or &#x27;y&#x27;.</span>
+    x.<span class="hljs-title function_">toUpperCase</span>();
+    y.<span class="hljs-title function_">toLowerCase</span>();
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(y);
+  }
+}
+</code></pre>
+<h2 id="%E4%BE%9D%E6%8D%AEin%E7%BC%A9%E5%B0%8F%E7%B1%BB%E5%9E%8B%E8%8C%83%E5%9B%B4" tabindex="-1">依据<code class="hljs"><span class="hljs-attribute">in</span></code>缩小类型范围</h2>
+<p>可以根据<code class="hljs"><span class="hljs-attribute">in</span></code>操作符判断属性是否存在于相应引用值上，从而判断出该引用值所对应的类型：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">Fish</span> = { <span class="hljs-attr">swim</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span> };
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Bird</span> = { <span class="hljs-attr">fly</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span> };
+ 
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">move</span>(<span class="hljs-params">animal: Fish | Bird</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;swim&quot;</span> <span class="hljs-keyword">in</span> animal) { <span class="hljs-comment">// 当animal上具有swim方法时，说明其类型为Fish</span>
+    <span class="hljs-keyword">return</span> animal.<span class="hljs-title function_">swim</span>();
+  }
+  <span class="hljs-keyword">return</span> animal.<span class="hljs-title function_">fly</span>();
+}
+</code></pre>
+<p>如果有第三种类型（或更多）兼具了前两种类型，TypeScript会适当的缩小值的类型范围以包括值可能为第三种类型的可能性：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">Fish</span> = { <span class="hljs-attr">swim</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span> };
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Bird</span> = { <span class="hljs-attr">fly</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span> };
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Human</span> = { swim?: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span>; fly?: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span> };
+ 
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">move</span>(<span class="hljs-params">animal: Fish | Bird | Human</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;swim&quot;</span> <span class="hljs-keyword">in</span> animal) {
+    animal; <span class="hljs-comment">// (parameter) animal: Fish | Human</span>
+  } <span class="hljs-keyword">else</span> {
+    animal; <span class="hljs-comment">// (parameter) animal: Bird | Human</span>
+  }
+}
+</code></pre>
+<h2 id="%E4%BE%9D%E6%8D%AEinstanceof%E7%BC%A9%E5%B0%8F%E7%B1%BB%E5%9E%8B%E8%8C%83%E5%9B%B4" tabindex="-1">依据<code class="hljs"><span class="hljs-attribute">instanceOf</span></code>缩小类型范围</h2>
+<p>可以根据<code class="hljs"><span class="hljs-attribute">instanceOf</span></code>分辨出原型链不同的两值从而缩小类型范围：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Clock</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Date</span> {
+  <span class="hljs-attr">dingDong</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span>
+}
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">logValue</span>(<span class="hljs-params">x: Clock | <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">if</span> (x <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Date</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x.<span class="hljs-title function_">dingDong</span>()); <span class="hljs-comment">// (parameter) x: Clock</span>
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x.<span class="hljs-title function_">toUpperCase</span>()); <span class="hljs-comment">// (parameter) x: string</span>
+  }
+}
+</code></pre>
+<h2 id="%E4%BE%9D%E6%8D%AE%E8%B5%8B%E5%80%BC%E7%BB%93%E6%9E%9C%E7%BC%A9%E5%B0%8F%E7%B1%BB%E5%9E%8B%E8%8C%83%E5%9B%B4" tabindex="-1">依据赋值结果缩小类型范围</h2>
+<p>在类型推断部分我们有讲过，TypeScript可以为变量赋值自动推断出相应类型，同样，TypeScript可以依据自身的特性作为缩小类型范围的手段：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">let</span> x = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() &lt; <span class="hljs-number">0.5</span> ? <span class="hljs-number">10</span> : <span class="hljs-string">&quot;hello world!&quot;</span>; <span class="hljs-comment">// let x: string | number</span>
+
+x = <span class="hljs-number">1</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x); <span class="hljs-comment">// let x: number</span>
+
+x = <span class="hljs-string">&quot;goodbye!&quot;</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x); <span class="hljs-comment">// let x: string           </span>
+
+x = <span class="hljs-literal">true</span>; <span class="hljs-comment">// Type &#x27;boolean&#x27; is not assignable to type &#x27;string | number&#x27;.</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x); <span class="hljs-comment">// let x: string | number</span>
+</code></pre>
+<h2 id="%E6%8E%A7%E5%88%B6%E6%B5%81%E5%88%86%E6%9E%90" tabindex="-1">控制流分析</h2>
+<p>TypeScript可以根据<code class="hljs"><span class="hljs-attribute">if</span></code>语句结合前面提到的缩小类型范围的方法来分析出变量在各块作用域中的类型：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">example</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">let</span> <span class="hljs-attr">x</span>: <span class="hljs-built_in">string</span> | <span class="hljs-built_in">number</span> | <span class="hljs-built_in">boolean</span>;
+ 
+  x = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() &lt; <span class="hljs-number">0.5</span>; 
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x); <span class="hljs-comment">// let x: boolean</span>
+ 
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() &lt; <span class="hljs-number">0.5</span>) {
+    x = <span class="hljs-string">&quot;hello&quot;</span>;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x); <span class="hljs-comment">// let x: string</span>
+  } <span class="hljs-keyword">else</span> {
+    x = <span class="hljs-number">100</span>;
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x); <span class="hljs-comment">// let x: number</span>
+  }
+ 
+  <span class="hljs-keyword">return</span> x; <span class="hljs-comment">// let x: string | number</span>
+}
+</code></pre>
+<h2 id="%E7%B1%BB%E5%9E%8B%E8%B0%93%E8%AF%8D" tabindex="-1">类型谓词</h2>
+<p>在对于对象类型的值进行范围缩小处理时，会比较棘手：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">Fish</span> = {
+  <span class="hljs-attr">swim</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span>
+}
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Bird</span> = {
+  <span class="hljs-attr">fly</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">void</span>
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">generatefish</span>(<span class="hljs-params"></span>): <span class="hljs-title class_">Fish</span> {
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">swim</span>: <span class="hljs-function">() =&gt;</span> { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;I can swiim&#x27;</span>) }
+  }
+}
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">generatebird</span>(<span class="hljs-params"></span>): <span class="hljs-title class_">Bird</span> {
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">fly</span>: <span class="hljs-function">() =&gt;</span> { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;I can fly&#x27;</span>) }
+  }
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">isFish</span>(<span class="hljs-params">pet: Fish | Bird</span>) {
+  <span class="hljs-keyword">return</span> (pet <span class="hljs-keyword">as</span> <span class="hljs-title class_">Fish</span>).<span class="hljs-property">swim</span> !== <span class="hljs-literal">undefined</span>;
+}
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getRandomPet</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() &gt; <span class="hljs-number">0.5</span> ? <span class="hljs-title function_">generatefish</span>() : <span class="hljs-title function_">generatebird</span>()
+}
+<span class="hljs-keyword">const</span> pet = <span class="hljs-title function_">getRandomPet</span>()
+
+<span class="hljs-keyword">if</span> (<span class="hljs-title function_">isFish</span>(pet)) {
+  pet.<span class="hljs-title function_">swim</span>()
+  <span class="hljs-comment">// Property &#x27;swim&#x27; does not exist on type &#x27;Fish | Bird&#x27;.</span>
+  <span class="hljs-comment">// Property &#x27;swim&#x27; does not exist on type &#x27;Bird&#x27;.</span>
+} <span class="hljs-keyword">else</span> {
+  pet.<span class="hljs-title function_">fly</span>()
+  <span class="hljs-comment">// Property &#x27;fly&#x27; does not exist on type &#x27;Fish | Bird&#x27;. </span>
+  <span class="hljs-comment">// Property &#x27;fly&#x27; does not exist on type &#x27;Fish&#x27;.</span>
+}
+</code></pre>
+<p>可以从报错中看出，TypeScript无法通过<code class="hljs"><span class="hljs-function"><span class="hljs-title">isFish</span><span class="hljs-params">()</span></span></code>的返回值（boolean）作出类型范围缩小，这时候需要我们手动的添加谓词以告知TypeScript<code class="hljs"><span class="hljs-function"><span class="hljs-title">isFish</span><span class="hljs-params">()</span></span></code>所返回的布尔值表示的结果，从而TypeScript以此结果进行类型范围缩小：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">isFish</span>(<span class="hljs-params">pet: Fish | Bird</span>):pet is <span class="hljs-title class_">Fish</span> {
+  <span class="hljs-keyword">return</span> (pet <span class="hljs-keyword">as</span> <span class="hljs-title class_">Fish</span>).<span class="hljs-property">swim</span> !== <span class="hljs-literal">undefined</span>;
+}
+<span class="hljs-keyword">if</span> (<span class="hljs-title function_">isFish</span>(pet)) {
+  pet.<span class="hljs-title function_">swim</span>() <span class="hljs-comment">// const pet: Fish</span>
+} <span class="hljs-keyword">else</span> {
+  pet.<span class="hljs-title function_">fly</span>() <span class="hljs-comment">// const pet: Bird</span>
+}
+</code></pre>
+<p>可以看出，<strong>谓词的定义形式为</strong><code class="hljs">**参数 <span class="hljs-keyword">is</span> 类型**</code><strong>，参数只能为相应函数中的形参</strong>。
+通常类型谓词可使用于以下场景：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-attr">underWater</span>: <span class="hljs-title class_">Fish</span>[] = zoo.<span class="hljs-title function_">filter</span>(isFish);
+</code></pre>
+<h2 id="%E6%9B%B4%E5%8A%A0%E7%BB%86%E8%87%B4%E5%9C%B0%E4%BD%BF%E7%94%A8%E8%81%94%E5%90%88%E7%B1%BB%E5%9E%8B" tabindex="-1">更加细致地使用联合类型</h2>
+<p>在项目开发中，我们会通常会运用到较为复杂的结构：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Shape</span> {
+  <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;circle&quot;</span> | <span class="hljs-string">&quot;square&quot;</span>;
+  radius?: <span class="hljs-built_in">number</span>;
+  sideLength?: <span class="hljs-built_in">number</span>;
+}
+</code></pre>
+<p>对于上面定义的接口，我们希望根据<code class="hljs"><span class="hljs-attribute">kind</span></code>属性判断出实例为圆形<code class="hljs"><span class="hljs-string">&quot;circle&quot;</span></code>或是正方形<code class="hljs"><span class="hljs-string">&quot;square&quot;</span></code>，以分别用各自的基准(<code class="hljs"><span class="hljs-attribute">radius</span></code>或<code class="hljs"><span class="hljs-attribute">sideLength</span></code>)来计算面积，因为类型的不固定性，所以将基准设为可选的。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getArea</span>(<span class="hljs-params">shape: Shape</span>) {
+  <span class="hljs-keyword">if</span> (shape.<span class="hljs-property">kind</span> === <span class="hljs-string">&quot;circle&quot;</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * shape.<span class="hljs-property">radius</span> ** <span class="hljs-number">2</span>;<span class="hljs-comment">// Object is possibly &#x27;undefined&#x27;.</span>
+  }
+}
+</code></pre>
+<p>这时我们会发现TypeScript会报错，因为可选性，它认为<code class="hljs"><span class="hljs-attribute">shape</span></code>可能为不存在<code class="hljs"><span class="hljs-attribute">radius</span></code>属性。
+或许我们可以根据非空断言<code class="hljs"><span class="hljs-addition">!</span></code>来提示TypeScript：当<code class="hljs"><span class="hljs-attribute">shape</span></code>为<code class="hljs">circle</code>时，<code class="hljs"><span class="hljs-attribute">radius</span></code>必定存在：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getArea</span>(<span class="hljs-params">shape: Shape</span>) {
+  <span class="hljs-keyword">if</span> (shape.<span class="hljs-property">kind</span> === <span class="hljs-string">&quot;circle&quot;</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * shape.<span class="hljs-property">radius</span>! ** <span class="hljs-number">2</span>;
+  }
+}
+</code></pre>
+<p>非空断言在此处确实派上了用场，但这种解决方案只是差强人意，因为对于类型的阐述不是十分明了，既然一个接口内涵盖了两种不同的类型，为什么不分开表示再使用联合类型结合呢？所以我们可以对接口进行拆分，即可以帮助TypeScript作出类型判断，也更加明了的对类型作出表示：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Circle</span> {
+  <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;circle&quot;</span>;
+  <span class="hljs-attr">radius</span>: <span class="hljs-built_in">number</span>;
+}
+ 
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Square</span> {
+  <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;square&quot;</span>;
+  <span class="hljs-attr">sideLength</span>: <span class="hljs-built_in">number</span>;
+}
+ 
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Shape</span> = <span class="hljs-title class_">Circle</span> | <span class="hljs-title class_">Square</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getArea</span>(<span class="hljs-params">shape: Shape</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * shape.<span class="hljs-property">radius</span> ** <span class="hljs-number">2</span>;
+  <span class="hljs-comment">// Property &#x27;radius&#x27; does not exist on type &#x27;Shape&#x27;.</span>
+  <span class="hljs-comment">// Property &#x27;radius&#x27; does not exist on type &#x27;Square&#x27;.</span>
+}
+<span class="hljs-comment">// 报错一目了然</span>
+
+<span class="hljs-comment">// 正确</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getArea</span>(<span class="hljs-params">shape: Shape</span>) {
+  <span class="hljs-keyword">if</span> (shape.<span class="hljs-property">kind</span> === <span class="hljs-string">&quot;circle&quot;</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * shape.<span class="hljs-property">radius</span> ** <span class="hljs-number">2</span>; <span class="hljs-comment">// (parameter) shape: Circle</span>
+  }
+  <span class="hljs-keyword">return</span> shape.<span class="hljs-property">sideLength</span> ** <span class="hljs-number">2</span>
+}
+
+<span class="hljs-comment">// 还可以使用switch语句</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getArea</span>(<span class="hljs-params">shape: Shape</span>) {
+  <span class="hljs-keyword">switch</span> (shape.<span class="hljs-property">kind</span>) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;circle&quot;</span>:
+      <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * shape.<span class="hljs-property">radius</span> ** <span class="hljs-number">2</span>; <span class="hljs-comment">// (parameter) shape: Circle</span>
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;square&quot;</span>:
+      <span class="hljs-keyword">return</span> shape.<span class="hljs-property">sideLength</span> ** <span class="hljs-number">2</span>; <span class="hljs-comment">// (parameter) shape: Square</span>
+  }
+}
+</code></pre>
+<p>现在TypeScript可以正确的作出类型范围缩小的举动，观察到现在，我是越来越感受到TypeScript中的类型系统对于类型管控的细致，也因此更加深入的理解了面向对象的思想（抽象出每一个可以独立的个体，更加的易于维护）。</p>
+<h2 id="never%E7%B1%BB%E5%9E%8B" tabindex="-1"><code class="hljs"><span class="hljs-attribute">never</span></code>类型</h2>
+<p>在使用类型范围缩小特性时，我们有可能会有将所有声明过的类型排除在外的情况（特别在运用<code class="hljs"><span class="hljs-keyword">switch</span></code>语句时），在排除了所有类型的可能性后，TypeScript会将类型注解为<code class="hljs"><span class="hljs-attribute">never</span></code>：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Circle</span> {
+  kind!: <span class="hljs-string">&quot;circle&quot;</span>;
+  <span class="hljs-attr">radius</span>: <span class="hljs-built_in">number</span>;
+}
+ 
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Square</span> {
+  kind!: <span class="hljs-string">&quot;square&quot;</span>;
+  <span class="hljs-attr">sideLength</span>: <span class="hljs-built_in">number</span>;
+}
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Shape</span> = <span class="hljs-title class_">Circle</span> | <span class="hljs-title class_">Square</span>;
+ 
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getArea</span>(<span class="hljs-params">shape: Shape</span>) {
+  <span class="hljs-keyword">switch</span> (shape.<span class="hljs-property">kind</span>) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;circle&quot;</span>:
+      <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * shape.<span class="hljs-property">radius</span> ** <span class="hljs-number">2</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;square&quot;</span>:
+      <span class="hljs-keyword">return</span> shape.<span class="hljs-property">sideLength</span> ** <span class="hljs-number">2</span>;
+    <span class="hljs-attr">default</span>:
+      <span class="hljs-keyword">const</span> _exhaustiveCheck = shape; <span class="hljs-comment">// 即便不添加类型注解，也会自动推断为never</span>
+      <span class="hljs-keyword">return</span> _exhaustiveCheck;
+  }
+}
+</code></pre>
+<p>以上代码中，TypeScript包含了对于<code class="hljs"><span class="hljs-attribute">shape</span></code>的<code class="hljs"><span class="hljs-attribute">kind</span></code>类型判断的所有情况：<code class="hljs"><span class="hljs-string">&quot;circle&quot;</span></code>、<code class="hljs"><span class="hljs-string">&quot;square&quot;</span></code>或不存在。如果我们希望规定<code class="hljs"><span class="hljs-built_in">shape</span>.<span class="hljs-keyword">kind</span></code>仅存在于以上三种情况，避免对于<code class="hljs"><span class="hljs-attribute">Shape</span></code>类型的扩展呢？此时，<code class="hljs"><span class="hljs-attribute">never</span></code>类型便派上了用场，<strong>只要一个类型注解为never，则代表它将不存在任何类型</strong>：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">Shape</span> = <span class="hljs-title class_">Circle</span> | <span class="hljs-title class_">Square</span> | <span class="hljs-title class_">Triangle</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getArea</span>(<span class="hljs-params">shape: Shape</span>) {
+  <span class="hljs-keyword">switch</span> (shape.<span class="hljs-property">kind</span>) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;circle&quot;</span>:
+      <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * shape.<span class="hljs-property">radius</span> ** <span class="hljs-number">2</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;square&quot;</span>:
+      <span class="hljs-keyword">return</span> shape.<span class="hljs-property">sideLength</span> ** <span class="hljs-number">2</span>;
+    <span class="hljs-attr">default</span>:
+      <span class="hljs-keyword">const</span> <span class="hljs-attr">_exhaustiveCheck</span>: <span class="hljs-built_in">never</span> = shape;
+      <span class="hljs-comment">// Type &#x27;Triangle&#x27; is not assignable to type &#x27;never&#x27;.</span>
+      <span class="hljs-keyword">return</span> _exhaustiveCheck;
+  }
+}
+</code></pre>
+<p>此时尝试对<code class="hljs"><span class="hljs-attribute">Shape</span></code>类型进行扩展，TypeScript将会阻止这一行为。</p>
+<h1 id="%E6%8F%8F%E8%BF%B0%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B" tabindex="-1">描述函数类型</h1>
+<p>关于函数，使用得最多的类型注解形式是：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">fn: (a: <span class="hljs-built_in">string</span>) =&gt; <span class="hljs-built_in">void</span></span>) { }
+<span class="hljs-comment">// 表示test函数的参数为fn，其类型为接收一个a变量的、返回值为空的函数</span>
+</code></pre>
+<p>除此以外，还可以使用<code class="hljs"><span class="hljs-keyword">type</span></code>进行定义：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> fncDescriptor = <span class="hljs-function">(<span class="hljs-params">a: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-built_in">void</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">fn: fncDescriptor</span>) { }
+</code></pre>
+<h2 id="%E6%8B%A5%E6%9C%89%E5%B1%9E%E6%80%A7%E7%9A%84%E5%87%BD%E6%95%B0" tabindex="-1">拥有属性的函数</h2>
+<p>在JavaScript中，函数也是对象类型的一种，所以函数也可以拥有自身的属性。而以上两种定义方式，显然没有考虑到函数可能带有属性的情况：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> fncDescriptor = <span class="hljs-function">(<span class="hljs-params">a: <span class="hljs-built_in">string</span></span>) =&gt;</span> <span class="hljs-built_in">void</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">fn: fncDescriptor</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(fn.<span class="hljs-property">name</span>)
+  <span class="hljs-comment">// Property &#x27;name&#x27; does not exist on type &#x27;fncDescriptor&#x27;.</span>
+}
+</code></pre>
+<p>可以借助<code class="hljs"><span class="hljs-keyword">type</span></code>对函数以对象类型的定义方式来解决上面的错误情况：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> fncDescriptor = {
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>,
+  (<span class="hljs-attr">a</span>: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">void</span> <span class="hljs-comment">// 调用签名</span>
+}
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">fn: fncDescriptor</span>) { 
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(fn.<span class="hljs-property">name</span>)   <span class="hljs-comment">// correct</span>
+}
+</code></pre>
+<h2 id="%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0" tabindex="-1">构造函数</h2>
+<p>可以通过<code class="hljs"><span class="hljs-keyword">new</span></code>操作符对一个构造函数进行类型声明，此时非<code class="hljs"><span class="hljs-keyword">new</span></code>操作符的函数调用都会提示错误：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> constructFnc = <span class="hljs-keyword">new</span> () =&gt; {}
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">test</span>(<span class="hljs-params">Person: <span class="hljs-keyword">const</span> ructFnc</span>) {
+  <span class="hljs-title class_">Person</span>()
+  <span class="hljs-comment">// Value of type &#x27;constructFnc&#x27; is not callable. Did you mean to include &#x27;new&#x27;?</span>
+}
+
+<span class="hljs-comment">// 对于既可以作为构造函数调用，也可以作为普通函数调用的函数，可以以以下方式放宽类型</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">CallOrConstruct</span> {
+  <span class="hljs-keyword">new</span> (<span class="hljs-attr">s</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Date</span>;
+  (n?: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">number</span>;
+}
+</code></pre>
+<h2 id="%E5%87%BD%E6%95%B0%E9%87%8D%E8%BD%BD%EF%BC%88overload%EF%BC%89" tabindex="-1">函数重载（overload）</h2>
+<p>在静态类型的语言中，存在着函数重载的概念，即允许存在多个拥有不同形参（参数数量、类型或顺序不同）的同名函数，TypeScript也遵循了这一概念，对于JavaScript中同一函数、不同参数的表现分别进行类型注解。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">makeDate</span>(<span class="hljs-params">timestamp: <span class="hljs-built_in">number</span></span>): <span class="hljs-title class_">Date</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">makeDate</span>(<span class="hljs-params">m: <span class="hljs-built_in">number</span>, d: <span class="hljs-built_in">number</span>, y: <span class="hljs-built_in">number</span></span>): <span class="hljs-title class_">Date</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">makeDate</span>(<span class="hljs-params">mOrTimestamp: <span class="hljs-built_in">number</span>, d?: <span class="hljs-built_in">number</span>, y?: <span class="hljs-built_in">number</span></span>): <span class="hljs-title class_">Date</span> {
+  <span class="hljs-keyword">if</span> (d !== <span class="hljs-literal">undefined</span> &amp;&amp; y !== <span class="hljs-literal">undefined</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(y, mOrTimestamp, d);
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(mOrTimestamp);
+  }
+}
+<span class="hljs-keyword">const</span> d1 = <span class="hljs-title function_">makeDate</span>(<span class="hljs-number">12345678</span>);
+<span class="hljs-keyword">const</span> d2 = <span class="hljs-title function_">makeDate</span>(<span class="hljs-number">5</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>);
+<span class="hljs-keyword">const</span> d3 = <span class="hljs-title function_">makeDate</span>(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>); <span class="hljs-comment">// Error，没有需要 2 个参数的重载，但存在需要 1 或 3 个参数的重载。</span>
+</code></pre>
+<p>对于<code class="hljs"><span class="hljs-attribute">makeDate</span></code>函数而言，第1行与第2行的函数签名（也称为重载签名<code class="hljs"><span class="hljs-keyword">overload</span> signature</code>）分别表示<code class="hljs"><span class="hljs-attribute">makeDate</span></code>函数可能存在的重载形式参数（分别为1个参数或3个参数）。
+而第3行的函数签名（也称为实现签名<code class="hljs"><span class="hljs-keyword">implementation</span> signature</code>）中，包含了函数的具体实现，但该签名提供的参数形式仅为兼容函数重载所用，而不能以其本身的类型注解作为条件使用该函数（如只提供<code class="hljs"><span class="hljs-built_in">mOrTimestamp,</span> d</code>或<code class="hljs"><span class="hljs-built_in">mOrTimestamp,</span> y</code>参数）。</p>
+<blockquote>
+<p>实现签名应兼容所有的重载签名</p>
+</blockquote>
+<h2 id="%E5%87%BD%E6%95%B0%E4%B8%AD%E7%9A%84this" tabindex="-1">函数中的this</h2>
+<p>在JavaScript中，this指向代表了当前函数执行的作用域，但其指向可能被多种方式更改，所以在函数类型定义时，明确 this指向有助于规避实际运行时this指向混淆的问题。
+<code class="hljs"><span class="hljs-keyword">this</span></code>作为JavaScript的关键字，不能被开发者作为变量名进行声明，TypeScript借助这一准则，将this作为TypeScript中的变量进行类型注解。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Person</span> {
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>
+}
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">sayName</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>) <span class="hljs-comment">// Error, &#x27;this&#x27; implicitly has type &#x27;any&#x27; because it does not have a type annotation.</span>
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">sayName</span>(<span class="hljs-params"><span class="hljs-variable language_">this</span>: Person</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>) <span class="hljs-comment">// Corret</span>
+}
+</code></pre>
+<h1 id="%E6%B3%9B%E5%9E%8B" tabindex="-1">泛型</h1>
+<p>在函数中，形参与输出通常会有着某种联系（可能类型相同，也可能有着包含关系），泛型（generic type）可用于为函数指定为表示多种类型中的一种，使用泛型注解的变量，将统一为泛型最终表示的类型，以表示相应变量与该类型之间的联系。</p>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// Type类型将取决于arr数组中的元素类型</span>
+<span class="hljs-keyword">function</span> firstElement&lt;<span class="hljs-title class_">Type</span>&gt;(<span class="hljs-attr">arr</span>: <span class="hljs-title class_">Type</span>[]): <span class="hljs-title class_">Type</span> | <span class="hljs-literal">undefined</span> {
+  <span class="hljs-keyword">return</span> arr[<span class="hljs-number">0</span>];
+}
+<span class="hljs-comment">// s is of type &#x27;string&#x27;</span>
+<span class="hljs-keyword">const</span> s = <span class="hljs-title function_">firstElement</span>([<span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;b&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>]);
+<span class="hljs-comment">// n is of type &#x27;number&#x27;</span>
+<span class="hljs-keyword">const</span> n = <span class="hljs-title function_">firstElement</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
+<span class="hljs-comment">// u is of type undefined</span>
+<span class="hljs-keyword">const</span> u = <span class="hljs-title function_">firstElement</span>([]);
+</code></pre>
+<h2 id="%E6%B3%9B%E5%9E%8B%E7%9A%84%E7%B1%BB%E5%9E%8B%E6%8E%A8%E6%96%AD" tabindex="-1">泛型的类型推断</h2>
+<p>泛型的灵活性在于它可以根据函数传入的参数类型进行类型推断，在使用到该参数的语句中根据入参的类型进行类型检测：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> map&lt;<span class="hljs-title class_">Input</span>, <span class="hljs-title class_">Output</span>&gt;(<span class="hljs-attr">arr</span>: <span class="hljs-title class_">Input</span>[], <span class="hljs-attr">func</span>: <span class="hljs-function">(<span class="hljs-params">arg: Input</span>) =&gt;</span> <span class="hljs-title class_">Output</span>): <span class="hljs-title class_">Output</span>[] {
+  <span class="hljs-keyword">return</span> arr.<span class="hljs-title function_">map</span>(func);
+}
+ 
+<span class="hljs-comment">// Parameter &#x27;n&#x27; is of type &#x27;string&#x27;</span>
+<span class="hljs-comment">// &#x27;parsed&#x27; is of type &#x27;number[]&#x27;</span>
+<span class="hljs-keyword">const</span> parsed = <span class="hljs-title function_">map</span>([<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-string">&quot;3&quot;</span>], <span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> <span class="hljs-built_in">parseInt</span>(n));
+</code></pre>
+<h2 id="%E6%B3%9B%E5%9E%8B%E7%9A%84%E7%B1%BB%E5%9E%8B%E7%BA%A6%E6%9D%9F" tabindex="-1">泛型的类型约束</h2>
+<p>在有些情况下， 泛型允许通过的条件范围过大，我们希望加以约束，此时可以通过<code class="hljs"><span class="hljs-keyword">extends</span></code>进行约束条件的增加：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// 在JavaScript中，只有字符串和数组具有length属性，可以对其length进行比较</span>
+<span class="hljs-comment">// 若未向Type添加类型约束，TypeScript将会提示.length属性不存在与变量a与变量b中</span>
+<span class="hljs-keyword">function</span> longest&lt;<span class="hljs-title class_">Type</span> <span class="hljs-keyword">extends</span> { <span class="hljs-attr">length</span>: <span class="hljs-built_in">number</span> }&gt;(<span class="hljs-attr">a</span>: <span class="hljs-title class_">Type</span>, <span class="hljs-attr">b</span>: <span class="hljs-title class_">Type</span>) {
+  <span class="hljs-keyword">if</span> (a.<span class="hljs-property">length</span> &gt;= b.<span class="hljs-property">length</span>) {
+    <span class="hljs-keyword">return</span> a;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> b;
+  }
+} 
+<span class="hljs-comment">// longerArray is of type &#x27;number[]&#x27;</span>
+<span class="hljs-keyword">const</span> longerArray = <span class="hljs-title function_">longest</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
+<span class="hljs-comment">// longerString is of type &#x27;alice&#x27; | &#x27;bob&#x27;</span>
+<span class="hljs-keyword">const</span> longerString = <span class="hljs-title function_">longest</span>(<span class="hljs-string">&quot;alice&quot;</span>, <span class="hljs-string">&quot;bob&quot;</span>);
+<span class="hljs-comment">// Argument of type &#x27;number&#x27; is not assignable to parameter of type &#x27;{ length: number; }&#x27;.</span>
+<span class="hljs-keyword">const</span> notOK = <span class="hljs-title function_">longest</span>(<span class="hljs-number">10</span>, <span class="hljs-number">100</span>); <span class="hljs-comment">// Error! Numbers don&#x27;t have a &#x27;length&#x27; property</span>
+</code></pre>
+<h2 id="%E6%98%8E%E7%A1%AE%E5%8F%82%E6%95%B0%E7%B1%BB%E5%9E%8B" tabindex="-1">明确参数类型</h2>
+<p>除了在定义函数时对泛型进行约束，还可以在函数调用时进行泛型的类型约束，即明确传入参数的类型：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">function</span> combine&lt;<span class="hljs-title class_">Type</span>&gt;(<span class="hljs-attr">arr1</span>: <span class="hljs-title class_">Type</span>[], <span class="hljs-attr">arr2</span>: <span class="hljs-title class_">Type</span>[]): <span class="hljs-title class_">Type</span>[] {
+  <span class="hljs-keyword">return</span> arr1.<span class="hljs-title function_">concat</span>(arr2);
+}
+<span class="hljs-comment">// 泛型的类型推断会认为arr1与arr2以及combine函数的返回值类型相同</span>
+<span class="hljs-comment">// 所以在以下情况会出现错误</span>
+<span class="hljs-keyword">const</span> res = <span class="hljs-title function_">combine</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-string">&#x27;str&#x27;</span>])
+<span class="hljs-comment">// Type &#x27;string&#x27; is not assignable to type &#x27;number&#x27;.</span>
+
+<span class="hljs-keyword">const</span> res = combine&lt;<span class="hljs-built_in">number</span> | <span class="hljs-built_in">string</span>&gt;([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-string">&#x27;str&#x27;</span>]) <span class="hljs-comment">// correct</span>
+<span class="hljs-comment">// Type可以为number或string类型</span>
+</code></pre>
+<h2 id="%E5%AF%B9%E4%BA%8E%E6%B3%9B%E5%9E%8B%E7%9A%84%E6%80%BB%E7%BB%93" tabindex="-1">对于泛型的总结</h2>
+<p>本人觉得以抽象化的理念去进行理解使用泛型会更容易，泛型旨在更宽松、统一的描述函数参数类型，所以当遇到多个与形参相关类型，且其类型约束为两种及以上时，可以考虑将其抽象为泛型以使用。以此理念反向思考，就能得出以下几个不该使用泛型的情况，也是官网描述的情况：</p>
+<ul>
+<li>为泛型添加类型约束时，不应该添加过于宽松的类型（如any、unknown等），这样做可能会让TypeScript丧失了类型推断的能力。</li>
+</ul>
+<pre><code class="hljs language-typescript"><span class="hljs-comment">// Error</span>
+<span class="hljs-keyword">function</span> firstElement2&lt;<span class="hljs-title class_">Type</span> <span class="hljs-keyword">extends</span> <span class="hljs-built_in">any</span>[]&gt;(<span class="hljs-attr">arr</span>: <span class="hljs-title class_">Type</span>) {
+  <span class="hljs-keyword">return</span> arr[<span class="hljs-number">0</span>];
+}
+<span class="hljs-keyword">const</span> b = <span class="hljs-title function_">firstElement2</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]); <span class="hljs-comment">// 变量b的类型推断为any</span>
+
+<span class="hljs-comment">// correct</span>
+<span class="hljs-keyword">function</span> firstElement2&lt;<span class="hljs-title class_">Type</span>&gt;(<span class="hljs-attr">arr</span>: <span class="hljs-title class_">Type</span>[]) {
+  <span class="hljs-keyword">return</span> arr[<span class="hljs-number">0</span>];
+}
+<span class="hljs-keyword">const</span> b = <span class="hljs-title function_">firstElement2</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]); <span class="hljs-comment">// 变量b的类型推断为number</span>
+</code></pre>
+<ul>
+<li>泛型本身是对于多次出现类型的抽象化，如果对只出现一次的类型也进行泛型的定义将会毫无意义。（用泛型描述的类型需要出现两次及以上）</li>
+</ul>
+<h1 id="%E9%81%8D%E5%8E%86%E7%B1%BB%E5%9E%8B%EF%BC%88mapped-types%EF%BC%89" tabindex="-1">遍历类型（Mapped types）</h1>
+<p><code class="hljs"><span class="hljs-attribute">Mapped types</span></code>是基于泛型的一种可以忽略键名的类型注解形式。如：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">MappedTypes</span> = {
+  [<span class="hljs-attr">key</span>: <span class="hljs-built_in">string</span>]: <span class="hljs-built_in">boolean</span> | <span class="hljs-built_in">number</span>
+}
+
+<span class="hljs-comment">// all correct</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">obj</span>: <span class="hljs-title class_">MappedTypes</span> = {
+  <span class="hljs-attr">one</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">two</span>: <span class="hljs-built_in">number</span>
+}
+</code></pre>
+<p>以上的<code class="hljs"><span class="hljs-attribute">obj</span></code>对象的所有键值都可以为联合类型<code class="hljs"><span class="hljs-built_in">boolean</span> ｜ <span class="hljs-built_in">number</span></code>中的一种。
+还可以将一个对象类型赋予给另一个对象：</p>
+<pre><code class="hljs"><span class="hljs-keyword">type</span> <span class="hljs-type">OtherType</span> = {
+  name: () =&gt; void;
+  age: () =&gt; void;
+}
+<span class="hljs-keyword">type</span> <span class="hljs-type">MappedTypes</span>&lt;<span class="hljs-type">Type</span>&gt; = {
+  [<span class="hljs-type">Property</span> in keyof <span class="hljs-type">Type</span>]: string | number
+}
+<span class="hljs-keyword">type</span> <span class="hljs-type">TestMappedTypes</span> = <span class="hljs-type">MappedTypes</span>&lt;<span class="hljs-type">OtherType</span>&gt;
+</code></pre>
+<p>以上的<code class="hljs"><span class="hljs-attribute">TestMappedTypes</span></code>类型中，表示的<code class="hljs"><span class="hljs-keyword">name</span></code>与<code class="hljs"><span class="hljs-attribute">age</span></code>字段皆为联合类型<code class="hljs"><span class="hljs-built_in">string</span> ｜ <span class="hljs-built_in">number</span></code>。</p>
+<h2 id="%E6%93%8D%E4%BD%9C%E4%BF%AE%E9%A5%B0%E7%AC%A6" tabindex="-1">操作修饰符</h2>
+<p>拥有修饰符（如<code class="hljs"><span class="hljs-keyword">readonly</span></code>等）等类型注解，同样可以进行类型遍历，最终表示的类型中会拥有相应的修饰符：</p>
+<pre><code class="hljs language-typescript"><span class="hljs-keyword">type</span> <span class="hljs-title class_">CreateMutable</span>&lt;<span class="hljs-title class_">Type</span>&gt; = {
+  <span class="hljs-keyword">readonly</span> [<span class="hljs-title class_">Property</span> <span class="hljs-keyword">in</span> keyof <span class="hljs-title class_">Type</span>]: <span class="hljs-title class_">Type</span>[<span class="hljs-title class_">Property</span>];
+};
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">LockedAccount</span> = {
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;
+};
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">UnlockedAccount</span> = <span class="hljs-title class_">CreateMutable</span>&lt;<span class="hljs-title class_">LockedAccount</span>&gt;;
+<span class="hljs-comment">/*
+ * type UnlockedAccount = {
+ *   readonly id: string;
+ *   readonly name: string;
+ * }
+ */</span>
+</code></pre>
+<p>以上的<code class="hljs"><span class="hljs-attribute">UnlockedAccount</span></code>类型具有两个字段，都具有<code class="hljs"><span class="hljs-keyword">readonly</span></code>修饰符，因为在<code class="hljs"><span class="hljs-attribute">CreateMutable</span></code>类型中，<code class="hljs"><span class="hljs-keyword">readonly</span></code>修饰符实际为<code class="hljs">+<span class="hljs-meta">readonly</span></code>，表示遍历属性都将添加<code class="hljs"><span class="hljs-keyword">readonly</span></code>修饰符，如需取消修饰符，在修饰符添加前缀<code class="hljs"><span class="hljs-deletion">-</span></code>即可（如<code class="hljs">-<span class="hljs-meta">readonly</span></code>）。</p>
+
+</body>
+</html>

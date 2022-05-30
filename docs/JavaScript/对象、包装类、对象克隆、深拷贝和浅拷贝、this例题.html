@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <p>JavaScript中有三种对象，分别是本地对象、内置对象和宿主对象。本地对象和内置对象都是ES的内部对象。
+1、本地对象（Native Object）：
+Object    Function    Array    String    Number    Boolean    Error    EvalError    SyntaxError    RangeError    ReferenceError    TypeError    URIError    Date    RegExp
+2、内置对象（Built-in Object）：
+Global（全局的统称，包含属性和方法）    Math
+3、宿主对象（Host Object）：
+执行JS脚本的环境提供的对象，故也称浏览器对象，有兼容性问题。
+浏览器对象window（BOM）和document（DOM），document是存放在window底下的。</p>
+<h1 id="1%E3%80%81%E5%AF%B9%E8%B1%A1%E7%9A%84%E4%B8%A4%E7%A7%8D%E5%88%9B%E5%BB%BA%E6%96%B9%E5%BC%8F" tabindex="-1">1、对象的两种创建方式</h1>
+<p>对象字面量：var obj = {}
+构造函数创建：var obj = new Object()</p>
+<h1 id="2%E3%80%81%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5" tabindex="-1">2、对象的增删改查</h1>
+<p>对象的增改查都可直接通过点语法进行操作，删除需通过delete关键字。如 delete  test.name。</p>
+<h1 id="3%E3%80%81%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E7%9A%84%E9%81%8D%E5%8E%86" tabindex="-1">3、对象属性的遍历</h1>
+<p>在访问对象时使用的点语法，实际上都会被JS引擎转换为['...']的访问形式。
+可以使用for...in遍历对象属性。但for...in会将原型链上原型的属性也遍历出来，使用hasOwnProperty方法可以只遍历自身拥有的属性。
+如下：
+for(var key in obj){
+console.log(obj[key]);//输出对象各属性的值（包括原型上的属性）
+if(obj.hasOwnProperty(key))
+console.log(obj[key]);//输出对象自身的属性值
+}</p>
+<h1 id="4%E3%80%81%E5%8C%85%E8%A3%85%E7%B1%BB" tabindex="-1">4、包装类</h1>
+<p>原始值没有自己的方法和属性，而通过实例化生成的原始值是对象。
+例：
+var a = new Number(3);
+a.len = 3;
+console.log(a.len);//输出3
+如果直接给原始值添加属性，则JS引擎执行流程如下：
+var a = 123;
+a.len = 3;//JS引擎在执行这一步时会将该语句转化为new Number(123).len = 3，因为没有变量接受该语句的结果，所以JS引擎会用delete关键字将该结果删除
+console.log(a.len)；//输出undefined
+在获取字符串的长度的时候，实际上是调用了包装类的属性。如下：
+var str = 'abc'
+console.log(str.length);//JS引擎将str.length转换成了new String(str).length;</p>
+<h1 id="5%E3%80%81%E6%B5%85%E6%8B%B7%E8%B4%9D%E5%92%8C%E6%B7%B1%E6%8B%B7%E8%B4%9D" tabindex="-1">5、浅拷贝和深拷贝</h1>
+<p>浅拷贝的方式是新建一个对象，遍历源对象，将其键值赋值给新建对象。即只复制对象空间而不复制资源。
+如下：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> obj1 = {
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;obj1&#x27;</span>,
+  <span class="hljs-attr">detail</span>: {
+  <span class="hljs-attr">num</span>: <span class="hljs-number">21</span>
+  }
+}
+<span class="hljs-keyword">var</span> obj2 = <span class="hljs-title function_">clone</span>(obj1);
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">clone</span> (origin, target) {
+  <span class="hljs-keyword">var</span> tar = target || {};
+  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> origin) {
+    <span class="hljs-keyword">if</span> (origin.<span class="hljs-title function_">hasOwnProperty</span>(key)) { <span class="hljs-comment">//只复制origin自身的属性</span>
+      tar[key]  = origin[key];
+    }
+  }
+  <span class="hljs-keyword">return</span> tar;
+}
+</code></pre>
+<p>深拷贝则会新建一个对象，内容结构跟源对象相同，但相同属性引用值与源对象的引用值所指向的空间是相互独立的。
+如下：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-comment">//1、ES5</span>
+<span class="hljs-keyword">var</span> obj1 = {
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;obj1&#x27;</span>,
+  <span class="hljs-attr">detail</span>: {
+      <span class="hljs-attr">num</span>: <span class="hljs-number">21</span>
+  }
+}
+<span class="hljs-keyword">var</span> obj2 = <span class="hljs-title function_">deepclone</span>(obj1);
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">deepclone</span> (origin, target) {
+  <span class="hljs-keyword">var</span> target = target || {},
+      tostr = <span class="hljs-title class_">Object</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">toString</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> origin) {
+      <span class="hljs-keyword">if</span> (origin.<span class="hljs-title function_">hasOwnProperty</span>(key)) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-title function_">typeof</span>(origin[key]) ===  <span class="hljs-string">&#x27;object&#x27;</span> &amp;&amp; origin[key] !== <span class="hljs-literal">null</span>) {
+          <span class="hljs-keyword">if</span> (tostr.<span class="hljs-title function_">call</span>(origin[key]) === <span class="hljs-string">&#x27;[object Array]&#x27;</span>) {
+            target[key] = [];
+          } <span class="hljs-keyword">else</span> {
+            target[key] = {};
+          }
+          <span class="hljs-title function_">deepclone</span>(origin[key], target[key]);
+        } <span class="hljs-keyword">else</span> {
+          target[key]  = origin[key];
+        }
+      }
+  }
+  <span class="hljs-keyword">return</span> target;
+}
+
+<span class="hljs-comment">//2、ES6</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">deepClone</span>(<span class="hljs-params">origin, hashMap = <span class="hljs-keyword">new</span> <span class="hljs-built_in">WeakMap</span>()</span>) {
+  <span class="hljs-keyword">if</span> (origin == <span class="hljs-literal">undefined</span> || <span class="hljs-keyword">typeof</span> origin !== <span class="hljs-string">&#x27;object&#x27;</span>) {
+    <span class="hljs-keyword">return</span> origin
+  }
+
+  <span class="hljs-keyword">if</span> (origin <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Date</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(origin)
+  }
+
+  <span class="hljs-keyword">if</span> (origin <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">RegExp</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(origin)
+  }
+
+  <span class="hljs-keyword">const</span> hashKey = hashMap.<span class="hljs-title function_">get</span>(origin) <span class="hljs-comment">//利用WeakMap的特性判断该引用值是否已经被拷贝，避免重复引用导致拷贝消耗过多内存</span>
+  <span class="hljs-keyword">if</span> (hashKey) {
+    <span class="hljs-keyword">return</span> hashKey
+  }
+  
+  <span class="hljs-keyword">var</span> newObj = <span class="hljs-keyword">new</span> origin.<span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>)
+	hashMap.<span class="hljs-title function_">set</span>(origin, newObj)
+  
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> k <span class="hljs-keyword">in</span> origin) {
+    <span class="hljs-keyword">if</span> (origin.<span class="hljs-title function_">hasOwnProperty</span>(k)) {
+      newObj[k] = <span class="hljs-title function_">deepClone</span>(origin[k], hashMap)
+    }
+  }
+
+  <span class="hljs-keyword">return</span> newObj
+}
+</code></pre>
+<p>深拷贝还有几种方法：
+1、JSON.parse(JSON.stringify(obj)); (该方法无法拷贝函数）
+2、JQ</p>
+<h1 id="6%E3%80%81this%E4%BE%8B%E9%A2%98" tabindex="-1">6、this例题</h1>
+<p>var name = '222';
+var a = {
+  name: '111',
+  say: function () {
+    console.log(this.name)
+  }
+}
+var fun = a.say
+fun()//输出222
+a.say()//输出111
+var b = {
+  name: '333',
+  say: function (fun) {
+    fun()
+  }
+}
+b.say(a.say)//输出222
+b.say = a.say
+b.say()//输出333</p>
+
+</body>
+</html>

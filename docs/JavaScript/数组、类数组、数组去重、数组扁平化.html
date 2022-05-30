@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <h1 id="1%E3%80%81%E6%95%B0%E7%BB%84%E5%A3%B0%E6%98%8E%E7%9A%84%E6%96%B9%E6%B3%95" tabindex="-1">1、数组声明的方法</h1>
+<p>数组有两种声明方法：数组字面量和Array构造函数实例化声明。
+var arr1 = [];
+var arr2 = new Array();
+var arr3 = Array();//也能生成数组，仅作了解，不使用。
+所有数组都继承于Array.prototype</p>
+<h1 id="2%E3%80%81%E7%A8%80%E6%9D%BE%E6%95%B0%E7%BB%84" tabindex="-1">2、稀松数组</h1>
+<p>数组没有要求每一项都有值，当某一项没有值时，会显示empty。如果数组在最后有逗号，则逗号后面的empty并不会计入数组项。
+例：
+var arr = [1,2, , ,3,]
+console.log(arr.length);//输出5
+当一个数组有某些值为empty值，称为稀松数组。稀松数组只能通过数组字面量声明。</p>
+<h1 id="3%E3%80%81%E6%95%B0%E7%BB%84%E6%96%B9%E6%B3%95" tabindex="-1">3、数组方法</h1>
+<h3 id="1%E3%80%81push%E3%80%81unshift%EF%BC%88%E6%B7%BB%E5%8A%A0%E5%85%83%E7%B4%A0%EF%BC%89*%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%95%B0%E7%BB%84" tabindex="-1">1、push、unshift（添加元素）*修改原数组</h3>
+<p>push方法可以在数组尾部给数组添加元素，返回值是执行了方法以后的数组长度，接收参数可以有多个。
+push方法可以在数组头部给数组添加元素，返回值是执行了方法以后的数组长度，接收参数可以有多个。
+push原生实现：
+Array.prototype.mypush  = function () {
+  for (var i = 0; i &lt; arguments.length; i++) {
+    this[this.length] = arguments[i];
+  }
+  return this;
+}</p>
+<h3 id="2%E3%80%81pop%E3%80%81-shift%EF%BC%88%E5%88%A0%E9%99%A4%E5%85%83%E7%B4%A0%EF%BC%89*%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%95%B0%E7%BB%84" tabindex="-1">2、pop、 shift（删除元素）*修改原数组</h3>
+<p>pop方法可以从数组尾部删除一个数组元素，返回值是从数组中删除的元素，没有接收参数。
+shift方法可以从数组头部删除一个数组元素，返回值是从数组中删除的元素，没有接收参数。</p>
+<h3 id="3%E3%80%81reverse%EF%BC%88%E5%80%92%E5%BA%8F%E6%8E%92%E5%88%97%E6%95%B0%E7%BB%84%EF%BC%89*%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%95%B0%E7%BB%84" tabindex="-1">3、reverse（倒序排列数组）*修改原数组</h3>
+<p>reverse方法可以将数组元素进行倒序排列，返回值是倒序排列后的数组。</p>
+<h3 id="4%E3%80%81splice%EF%BC%88%E5%89%AA%E5%88%87%E3%80%81%E6%B7%BB%E5%8A%A0%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%EF%BC%89*%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%95%B0%E7%BB%84" tabindex="-1">4、splice（剪切、添加数组元素）*修改原数组</h3>
+<p>splice（开始项的下标，剪切元素个数，剪切的最后一位处添加数据）splice方法的返回值是剪切出的元素。
+splice的第一个参数可以是负值，表示从数组尾部开始计算的下标（数组尾部第一个元素表示为-1）。
+splice不接收参数时，原数组不动；
+splice接收一个参数时，剪切该下标以及往后所有数组元素；</p>
+<h3 id="5%E3%80%81sort%EF%BC%88%E6%95%B0%E7%BB%84%E6%8E%92%E5%BA%8F%EF%BC%89*%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%95%B0%E7%BB%84" tabindex="-1">5、sort（数组排序）*修改原数组</h3>
+<p>sort的默认排序方式是依据ascii码来进行升序冒泡排列的，所以在不传参的情况下，sort方法对数字类型的元素进行排序时会不尽人意。sort方法的返回值是排序后的数组。
+sort方法可接收一个函数作为参数，sort会根据该函数中定义的规则对数组进行排序，如果函数中没有写排序规则，则不进行排序。该函数中接收参数a和参数b，若函数的返回值为负，则参数a在排序中排前面，若返回值为正，则参数b排前面，若为零，则两参数不进行排序操作。
+简单实现sort升序排序：
+arr.sort(function(a, b) {
+  return a-b;
+})</p>
+<h3 id="6%E3%80%81concat%EF%BC%88%E5%90%88%E5%B9%B6%E6%95%B0%E7%BB%84%EF%BC%89*%E7%94%9F%E6%88%90%E6%96%B0%E6%95%B0%E7%BB%84" tabindex="-1">6、concat（合并数组）*生成新数组</h3>
+<p>concat接收数组或数组元素作为参数（无限制），返回值为拼接后的新数组。
+tips：concat只能拼接数字或一维数组。会将要拼接的一维数组展开成单个元素后拼接。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr = [<span class="hljs-number">2</span>, <span class="hljs-number">3</span>,[<span class="hljs-number">4</span>]]
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>([<span class="hljs-number">1</span>].<span class="hljs-title function_">concat</span>(arr, <span class="hljs-number">5</span>)) <span class="hljs-comment">// 输出[1, 2, 3, [4], 5]</span>
+</code></pre>
+<h3 id="7%E3%80%81slice%EF%BC%88%E6%88%AA%E5%8F%96%EF%BC%89*%E7%94%9F%E6%88%90%E6%96%B0%E6%95%B0%E7%BB%84" tabindex="-1">7、slice（截取）*生成新数组</h3>
+<p>slice(开始项下标start（可选），结束项下标end（可选））slice方法会输出元素下标区间为[start, end)的所有元素。
+slice没有接收参数时，输出整个数组；
+slice接收一个参数时，输出从start下标开始到数组尾部的所有元素；
+当slice接收的参数为负值时，表示从数组尾部开始计算的下标（数组尾部第一个元素表示为-1）。</p>
+<h3 id="8%E3%80%81tostring" tabindex="-1">8、toString</h3>
+<p>toString（）方法将数组元素用逗号分隔的形式输出成字符串。</p>
+<h3 id="9%E3%80%81join" tabindex="-1">9、join</h3>
+<p>join（）方法将数组元素用以接收参数分割的形式形成一个新的字符串，返回值为该字符串。</p>
+<h3 id="10%E3%80%81split" tabindex="-1">10、split</h3>
+<p>split（）方法接收两个参数，将字符串的内容以第一个参数分隔后形成一个新的数组，第二个参数决定新数组的长度，返回值为该新数组。
+当split没有接收参数时，会将整个字符串形成一个只有一个元素的数组，当接收参数为''时，会将整个字符串的每个字符拆分成一个数组元素。</p>
+<h3 id="11%E3%80%81includes%EF%BC%88%E5%88%A4%E6%96%AD%E5%85%83%E7%B4%A0%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%EF%BC%89%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">11、includes（判断元素是否存在）（ES6新增）</h3>
+<p>includes方法的第一个参数为想要查找的元素值，第二个参数可选，为该次查找的开始下标。返回值为Boolean值，表示查找元素是否存在。</p>
+<h3 id="12%E3%80%81indexof%E5%92%8Clastindexof" tabindex="-1">12、indexOf和lastindexOf</h3>
+<p>分别为正向查找元素和反向查找元素，输出该元素的下标。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">3</span>]
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr.<span class="hljs-title function_">indexOf</span>(<span class="hljs-number">3</span>), arr.<span class="hljs-title function_">lastIndexOf</span>(<span class="hljs-number">3</span>)) <span class="hljs-comment">// 2 4</span>
+</code></pre>
+<h3 id="13%E3%80%81array.of()%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">13、Array.of()（ES6新增）</h3>
+<p>of()为静态方法，在Array构造函数下
+如果直接使用Array()且只传一个参数的话，结果会是创建相应长度的空数组，而用Array.of()就可以实现创建包含相应内容的数组。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr = <span class="hljs-title class_">Array</span>(<span class="hljs-number">3</span>)
+<span class="hljs-keyword">var</span> arr2 = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">of</span>(<span class="hljs-number">3</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr, arr2) <span class="hljs-comment">//[ &lt;3 empty items&gt; ] [ 3 ]</span>
+</code></pre>
+<h3 id="14%E3%80%81array.from()%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">14、Array.from()（ES6新增）</h3>
+<p>from()为静态方法，在Array构造函数下
+from()可以将类数组对象或可迭代转换成数组。</p>
+<h3 id="15%E3%80%81fill-*%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%95%B0%E7%BB%84%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">15、fill	*修改原数组（ES6新增）</h3>
+<p>fill()是Array原型下的方法，fill会将所有元素改为默认值（第一个参数）。
+如果没有参数，则会将用undefined把所以元素覆盖。
+如果有第二个参数，则会将该参数下标及往后元素都改为默认值。
+如果有第三个参数，则会把第二个参数和第三个参数作为左闭右开区间，将该区间内的元素改为默认值。
+tips：当第二个参数和第三个数自为非数字时，不会进行覆盖。当第二个参数为非数字、第三个参数为数字时，区间为[0, 第三个参数)。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr2 = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">of</span>(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr2.<span class="hljs-title function_">fill</span>(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>)) <span class="hljs-comment">// [3, 1, 1, 6]</span>
+</code></pre>
+<p>实现fill：</p>
+<pre><code class="hljs"><span class="hljs-keyword">Array</span>.prototype.myFill = <span class="hljs-keyword">function</span>(<span class="hljs-keyword">value</span>, <span class="hljs-keyword">start</span>, <span class="hljs-keyword">end</span>) {
+  var <span class="hljs-keyword">value</span> = <span class="hljs-keyword">value</span> || undefined,
+      start = <span class="hljs-keyword">start</span> &gt;&gt; <span class="hljs-number">0</span>
+  
+  <span class="hljs-keyword">if</span> (this == <span class="hljs-keyword">null</span>) {
+    throw <span class="hljs-built_in">new</span> TypeError(<span class="hljs-string">&#x27;This is null of not defined&#x27;</span>)
+  }
+
+  var obj = <span class="hljs-keyword">Object</span>(this),
+      len = obj.length &gt;&gt;&gt; <span class="hljs-number">0</span>
+
+  start = <span class="hljs-keyword">start</span> &lt; <span class="hljs-number">0</span> ?
+        Math.max(<span class="hljs-keyword">start</span> + len, <span class="hljs-number">0</span>) :
+        Math.min(<span class="hljs-keyword">start</span>, len)
+          
+
+  end = end === undefined ?
+        len :
+        <span class="hljs-keyword">end</span> &gt;&gt; <span class="hljs-number">0</span>
+  
+  end = <span class="hljs-keyword">end</span> &lt; <span class="hljs-number">0</span> ?
+        Math.max(<span class="hljs-keyword">end</span> + len, <span class="hljs-number">0</span>) :
+        Math.min(<span class="hljs-keyword">end</span>, len)
+  
+  <span class="hljs-keyword">while</span>(<span class="hljs-keyword">start</span> &lt; <span class="hljs-keyword">end</span>) {
+    obj[<span class="hljs-keyword">start</span>] = <span class="hljs-keyword">value</span>
+    <span class="hljs-keyword">start</span>++
+  }
+  
+  <span class="hljs-keyword">return</span> obj
+}
+</code></pre>
+<h3 id="16%E3%80%81find%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">16、find（ES6新增）</h3>
+<p>find()是Array原型下的方法，该方法返回提供的数组中满足提供的测试功能的第一个元素的值。如果没有值满足测试功能，则返回undefined。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">of</span>(<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr.<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">elem</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> elem &gt; <span class="hljs-number">4</span>
+})) <span class="hljs-comment">// 5</span>
+</code></pre>
+<h3 id="17%E3%80%81findindex%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">17、findIndex（ES6新增）</h3>
+<p>findIndex()是Array原型下的方法，该满足提供的测试功能的数组中第一个元素的索引。如果不存在，则返回-1。
+例：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> arr = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">of</span>(<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(arr.<span class="hljs-title function_">findIndex</span>(<span class="hljs-function"><span class="hljs-params">elem</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> elem &gt; <span class="hljs-number">4</span>
+})) <span class="hljs-comment">// 2</span>
+</code></pre>
+<h3 id="18%E3%80%81array.prototype.keys%E5%92%8Cobject.keys%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">18、Array.prototype.keys和Object.keys（ES6新增）</h3>
+<p>Array.prototype.keys方法返回一个包含数组中每个索引键的Array Iterator对象。Object.keys() 方法会返回一个由一个给定对象的自身可枚举属性组成的数组，数组中属性名的排列顺序和正常循环遍历该对象时返回的顺序一致 。</p>
+<h3 id="19%E3%80%81array.prototype.values%E5%92%8Cobject.values%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">19、Array.prototype.values和Object.values（ES6新增）</h3>
+<p>Array.prototype.values() 方法返回一个新的 Array Iterator 对象，该对象包含数组每个索引的值。Object.values()方法返回一个给定对象自身的所有可枚举属性值的数组，值的顺序与使用for...in循环的顺序相同 ( 区别在于 for-in 循环枚举原型链中的属性 )。</p>
+<h3 id="20%E3%80%81array.prototype.entries%E5%92%8Cobject.entries%EF%BC%88es6%E6%96%B0%E5%A2%9E%EF%BC%89" tabindex="-1">20、Array.prototype.entries和Object.entries（ES6新增）</h3>
+<p>Array.prototype.entries() 方法返回一个新的Array Iterator对象，该对象包含数组中每个索引的键/值对。Object.entries()方法返回一个给定对象自身可枚举属性的键值对数组，其排列与使用for...in循环遍历该对象时返回的顺序一致（区别在于 for-in 循环还会枚举原型链中的属性）。</p>
+<h1 id="4%E3%80%81%E7%B1%BB%E6%95%B0%E7%BB%84" tabindex="-1">4、类数组</h1>
+<p>类数组的原型是Object，所以无法使用数组的特有方法。
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1614421978966-d1161b14-9986-47ef-8757-ed578a88889e.png#height=85&amp;id=AUMU1&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=169&amp;originWidth=338&amp;originalType=binary&amp;ratio=1&amp;size=8412&amp;status=done&amp;style=none&amp;width=169" alt="image.png"><img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1614421908849-8c508344-374c-499b-b147-a82004702a9f.png#height=136&amp;id=HoD9N&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=272&amp;originWidth=333&amp;originalType=binary&amp;ratio=1&amp;size=12202&amp;status=done&amp;style=none&amp;width=166.5" alt="image.png">
+想让自己定义的类数组像系统定义的类数组一样以[]显示，只需给类数组添加继承于Array.prototype的splice属性。
+类数组可以继承Array.prototype上的数组方法来使用。类数组在使用数组方法时会基于自己的length属性操作，若没有length属性则会给类数组添加length属性（初始为0）。
+将类数组转换成数组类型，只需要使用Array.prototype.slice.call(类数组)，就能返回一个数组类型的类数组副本。</p>
+<h1 id="5%E3%80%81%E6%95%B0%E7%BB%84%E5%8E%BB%E9%87%8D" tabindex="-1">5、数组去重</h1>
+<p>第一种方法：通过对象属性来判断
+Array.prototype.unique = function () {
+ var obj = {}
+ var newArr = []
+ for (var i = 0; i &lt; this.length; i++) {
+   if (!obj.hasOwnProperty(this[i])) {
+     obj[this[i]] = this[i]
+     newArr.push(this[i])
+   }
+ }
+ return newArr
+}
+第二种方法：通过嵌套for判断
+function unique (array) {
+  var isrepeat,
+      _arr = []
+  for (var i = 0; i &lt; array.length; i++) {
+    isrepeat = false
+    for (var j = i + 1; j &lt; array.length; j++) {
+      if (array[i] === array[j]) {
+        isrepeat = true
+        break
+      }
+    }
+    if (isrepeat === false) {
+      _arr.push(array[i])
+    }
+  }
+  return _arr
+}
+或
+function unique (array) {
+  var isrepeat,
+      _arr = []
+  for (var i = 0; i &lt; array.length; i++) {
+    isrepeat = false
+    for (var j = 0; j &lt; _arr.length; j++) {
+      if (array[i] === _arr[j]) {
+        isrepeat = true
+        break
+      }
+    }
+    if (isrepeat === false) {
+      _arr.push(array[i])
+    }
+  }
+  return _arr
+}
+第三种方法：通过filter和indexOf判断
+function unique (array) {
+  return array.filter(function (item, index) {
+    return array.indexOf(item) === index
+  })
+}
+第四种方法：通过forEach和indexOf判断
+function unique (array) {
+  var _arr = []
+  array.forEach(item =&gt; {
+    if (_arr.indexOf(item) === -1) {
+      _arr.push(item)
+    }
+  })
+  return _arr
+}
+第五种方法：通过sort和reduce判断
+function unique (array) {
+  var arr = array
+  return arr.sort().reduce((prev, cur) =&gt; {
+    if (prev.length === 0 || prev[prev.length - 1] !== cur) {
+      prev.push(cur)
+    }
+    return prev
+  },[])
+}
+第六种方法：通过map和set判断
+function unique (array) {
+  var _arr = [],
+      temp = new Map()
+  for (var i = 0; i &lt; array.length; i++) {
+    if(!temp.get(array[i])) {
+      temp.set(array[i], 1)
+      _arr.push(array[i])
+    }
+  }
+  return _arr
+}
+function unique (array) {
+  return Array.from(new Set(array))
+}</p>
+<h1 id="6%E3%80%81%E6%95%B0%E7%BB%84%E6%89%81%E5%B9%B3%E5%8C%96" tabindex="-1">6、数组扁平化</h1>
+<p>数组扁平化的操作就是把多维数组转换为一位数组，将多维数组转换为一位数组的程序就叫做扁平化程序。</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">flatten</span> (array) {
+  <span class="hljs-keyword">var</span> array = array || [],
+      len = array.<span class="hljs-property">length</span>,
+      finalArr = [],
+      item
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; len; i++) {
+    item = array[i]
+    <span class="hljs-keyword">if</span> (<span class="hljs-title function_">isArray</span>(item)) {
+      finalArr = finalArr.<span class="hljs-title function_">concat</span>(<span class="hljs-title function_">flatten</span>(item))
+    } <span class="hljs-keyword">else</span> {
+      finalArr.<span class="hljs-title function_">push</span>(item)
+    }
+  }
+
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">isArray</span> (item) {
+    <span class="hljs-keyword">return</span> {}.<span class="hljs-property">toString</span>.<span class="hljs-title function_">call</span>(item) === <span class="hljs-string">&#x27;[object Array]&#x27;</span>
+  }
+
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">unique</span> (array) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>(array))
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">unique</span>(finalArr)
+}
+</code></pre>
+<p>或</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">flatten</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      toStr = {}.<span class="hljs-property">toString</span>,
+      farr = []
+  arr.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =&gt;</span> {
+    toStr.<span class="hljs-title function_">call</span>(item) === <span class="hljs-string">&#x27;[object Array]&#x27;</span> ? farr = farr.<span class="hljs-title function_">concat</span>(item.<span class="hljs-title function_">flatten</span>()): farr.<span class="hljs-title function_">push</span>(item)
+  })
+  <span class="hljs-keyword">return</span> farr
+}
+</code></pre>
+<p>或</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">flatten</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>
+  <span class="hljs-keyword">return</span> arr.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">prev, item</span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> prev.<span class="hljs-title function_">concat</span>(
+      toStr.<span class="hljs-title function_">call</span>(item) === <span class="hljs-string">&#x27;[object Array]&#x27;</span> 
+                      ? item.<span class="hljs-title function_">flatten</span>()
+                      : item
+    )
+  },[])
+}
+</code></pre>
+<p>或</p>
+<pre><code class="hljs language-javascript"><span class="hljs-comment">//利用栈的思想</span>
+<span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myFlat</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">var</span> arr = <span class="hljs-variable language_">this</span>,
+      stack = [...arr],
+      res = []
+
+  <span class="hljs-keyword">while</span> (stack.<span class="hljs-property">length</span>) {
+    <span class="hljs-keyword">var</span> popItem = stack.<span class="hljs-title function_">pop</span>()
+    <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(popItem)) {
+      stack.<span class="hljs-title function_">push</span>(...popItem)
+    } <span class="hljs-keyword">else</span> {
+      res.<span class="hljs-title function_">unshift</span>(popItem)
+    }
+  }
+  <span class="hljs-keyword">return</span> res
+}
+</code></pre>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <h1 id="1%E3%80%81%E5%8E%9F%E5%9E%8B%E6%A6%82%E5%BF%B5" tabindex="-1">1、原型概念</h1>
+<p>每个对象拥有一个原型对象，对象以其原型为模板、从原型继承方法和属性。</p>
+<h1 id="2%E3%80%81proto" tabindex="-1">2、<strong>proto</strong></h1>
+<p>在实例化对象的过程中，this对象中会存有__proto__对象，该对象保存着构造函数的原型，如果实例化对象访问的自身属性不存在时，会在__proto__对象中查找。
+function Test () {
+/*this={
+*    <strong>proto</strong>: Test.prototype
+*    }
+}
+所以说proto属于每个实例化的对象，而不是构造函数。
+__proto__属性是系统自带的，自己创建的__proto__属性无效。</p>
+<h1 id="3%E3%80%81constructor" tabindex="-1">3、constructor</h1>
+<p>实例化对象的原型对象中保存有constructor属性，该属性指向生成该实例化对象的构造函数。</p>
+<h1 id="4%E3%80%81%E5%8E%9F%E5%9E%8B%E9%93%BE" tabindex="-1">4、原型链</h1>
+<p>原型链的终点是Object.prototype。
+在继承的过程中，修改实例化对象中从原型获取的引用值，会影响到原型链中的该引用值，修改原始值则不会影响。如下：
+function Father(){
+this.name = 'father';
+this.num = 100;
+this.car = {
+name: 'BMW'
+}
+}
+var father = new Father()
+function Son(){}
+Son.prototype = father;
+var dog = new Son();
+dog.car.name = 'Benz';
+dog.num = 101;
+console.log(dog.car);//输出{name: 'Benz'}
+console.log(father.car);//输出{name: 'Benz'}
+console.log(dog.num);//输出101
+console.log(father.num);//输出100</p>
+<h1 id="5%E3%80%81object.create()" tabindex="-1">5、Object.create()</h1>
+<p>Object.create()可以创建一个对象，接受两个参数，第一个参数为必须，作为新创建对象的原型。
+提问：是不是所有对象都继承于Object.prototype？
+答：不是。如果使用Object.create(null)创建对象，则该对象没有原型，不存在继承Object.prototype。</p>
+<h1 id="6%E3%80%81call%E5%92%8Capply" tabindex="-1">6、call和apply</h1>
+<p>在调用函数时，其实系统隐式使用了call（）。使用call和apply调用函数会更改this的指向，两者的区别仅仅是第二个参数，call从第二个参数起的内容是对应一个个形参，apply的第二个参数接收的是arguments数组。
+可以用Object.prototype.toString.call()方法检验数据的类型。</p>
+<h1 id="7%E3%80%81instanceof" tabindex="-1">7、instanceof</h1>
+<p>A instanceof B
+如果B在A的原型链上，则输出true。</p>
+<h1 id="8%E3%80%81%E5%88%A4%E6%96%AD%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E6%B3%95" tabindex="-1">8、判断数据类型的三种方法</h1>
+<p>假设有变量a，检验其是否为数组的方法有三种：
+1、通过constructor判断
+a.constructor === Array
+2、通过instanceof判断
+a instanceof Array
+3、通过Object.prototype.toString.call()判断（建议用法）
+Object.prototype.toString.call(a)  === '[object Array]'</p>
+<h1 id="9%E3%80%81%E5%9C%A3%E6%9D%AF%E6%A8%A1%E5%BC%8F" tabindex="-1">9、圣杯模式</h1>
+<p>如果直接将A构造函数的原型直接赋予B构造函数原型的方式继承，则B构造函数实例化出来的对象在对其__proto__做出声明变量等操作时，会影响到A构造函数。而以圣杯模式继承，则是将A构造函数原型的所有属性都置于一个中间层的构造函数（即中间层的构造函数原型与A构造函数相同）实例化出来的对象上，B构造函数的原型指向中间层构造函数的实例化对象，这样在给B构造函数的原型添加属性时不会影响到A构造函数。如下：
+function Teacher() {
+this.name = 'Teacher'
+}
+Teacher.prototype = {
+  detail: {
+    num: 12,
+    age: 21
+  }
+}
+function Buffer (){</p>
+<p>}
+Buffer.prototype = Teacher.prototype
+var buffer = new Buffer()
+function Student(){
+  this.name='Student'
+}
+Student.prototype = buffer
+var student = new Student()
+Student.prototype.car = 'BMW'
+console.log(Teacher.prototype.car);//输出undefined
+console.log(student.car);//输出BMW</p>
+<h1 id="10%E3%80%81%E5%9C%A3%E6%9D%AF%E6%A8%A1%E5%BC%8F%E6%A8%A1%E5%9D%97%E5%8C%96" tabindex="-1">10、圣杯模式模块化</h1>
+<p>var inherit = (function () {
+var Buffer = function(){}
+return function(Target, Origin) {</p>
+<p>Buffer.prototype = Origin.prototype;
+Target.prototype = new Buffer();
+Target.prototype.construcor = Target;//将构造器指向本身
+Target.prototype.super_class = Origin;//该构造器的超类，即被继承方
+}
+})();</p>
+<h1 id="11%E3%80%81callee%E5%92%8Ccaller" tabindex="-1">11、callee和caller</h1>
+<p>arguments.callee指向的是所在函数，而caller指向的是调用当前函数的函数.</p>
+
+</body>
+</html>

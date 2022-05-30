@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <p>DOM的全称是Document Object Model（文档对象模型），DOM本身是对象，但它是宿主对象，因为它需要浏览器提供一系列的方法，而不是ECMAScript。DOM是浏览器提供的表示或者操作html和xml的一套方法（无法操作CSS）。在JS中，对于操作的HTML部分称之为DOM结构（DOM树）。</p>
+<h1 id="1%E3%80%81document" tabindex="-1">1、document</h1>
+<p>每个载入浏览器的 HTML 文档都会成为 Document 对象，里面存放了一系列获取和操作DOM树的方法。</p>
+<h1 id="2%E3%80%81%E8%8E%B7%E5%8F%96%E5%85%83%E7%B4%A0" tabindex="-1">2、获取元素</h1>
+<p>getElementById()    获取相应id的元素
+getElementsByName()    获取相应name的元素（不常用）
+getElementsByClassName()    获取包含相应类名的元素（取得结果是一个类数组）
+getElementsByTagName()    获取相应标签的元素（取得结果是一个类数组，兼容性高）
+querySelector()    querySelectorAll() （HTML5新引入的WEB API，兼容性高，其括号内参数选择元素的方法与css选择器相同，前者只会选择单项，后者可选择多项（类数组），但这两个方法的性能较差，且不实时，即其选择后存储的是片段而不是节点本身）
+例：
+var divs1 = document.getElementsByTagName('div');
+var divs2 = document.querySelectorAll('div');
+console.log(divs1);//输出[div, div, div]
+console.log(divs2);//输出[div, div, div]
+divs1[0].remove();
+divs2[0].remove();
+console.log(divs1);//输出[div, div]
+console.log(divs2);//输出[div, div, div]</p>
+<h1 id="3%E3%80%81%E8%8A%82%E7%82%B9%E5%92%8C%E9%81%8D%E5%8E%86%E8%8A%82%E7%82%B9%E6%A0%91" tabindex="-1">3、节点和遍历节点树</h1>
+<p>节点不是元素，而是包含着元素。节点包含了元素节点，属性节点，文本节点，注释节点，document节点，DocumentFragment节点。每一种节点都有相对应的节点号。元素节点也就是DOM元素。</p>
+<h3 id="1%E3%80%81%E9%81%8D%E5%8E%86%E8%8A%82%E7%82%B9%E6%A0%91%EF%BC%88%E5%85%BC%E5%AE%B9%E6%80%A7%E9%AB%98%EF%BC%89" tabindex="-1">1、遍历节点树（兼容性高）</h3>
+<p>parentNode（父节点）每个节点有且只有一个父节点（除了顶级的document），HTML的父节点是document。
+childNodes（子节点）每个元素可以有多个子节点，通过该属性选择出的子节点可能包含多种类型节点（即文本节点注释节点等）。
+firstChild    lastChild 前者为第一个子节点，后者为最后一个子节点。
+nextSibling    previousSibling 前者为下一个兄弟节点，后者为上一个兄弟节点。</p>
+<h3 id="2%E3%80%81%E9%81%8D%E5%8E%86%E5%85%83%E7%B4%A0%E8%8A%82%E7%82%B9%E6%A0%91%EF%BC%88%E4%B8%8D%E5%B8%B8%E7%94%A8%EF%BC%89" tabindex="-1">2、遍历元素节点树（不常用）</h3>
+<p>parentElement（父元素）节点的父元素，HTML没有父元素。（IE9以下不支持）
+children（子元素） 选择子元素。childElementCount = children.length（IE7以下不支持）
+firstElementChild    lastElementChild 前者为第一个子元素，后者为最后一个子元素。（IE9以下不支持）
+nextElementSibling    previousElementSibling 前者为下一个兄弟元素，后者为上一个兄弟元素。（IE9以下不支持）</p>
+<h1 id="4%E3%80%81%E8%8A%82%E7%82%B9%E5%B1%9E%E6%80%A7" tabindex="-1">4、节点属性</h1>
+<p>nodeName    节点名称，只读属性，元素节点返回的结果为大写。
+nodeValue    节点的值，读写属性，属性、注释、文本节点可用，元素节点没有该属性。
+getAttributeNode    获取属性节点，读写属性。
+nodeType    节点对应的节点类型号，只读属性。元素节点为1，属性节点为2，文本节点为3，注释节点为8，document为9，DocumentFragment为11.
+利用nodeType可以筛选出childNodes中的元素节点：
+function elementChild (node) {
+      var arr = [],
+          children = node.childNodes
+      for (var i = 0; i &lt; children.length; i++) {
+        var childItem = children[i]
+        if (childItem.nodeType === 1) {
+          arr.push(childItem)
+        }
+      }
+      return arr
+}
+attributes    节点的属性集合，读写属性。
+hasChildNodes（）    判断是否有子节点。</p>
+<h1 id="5%E3%80%81dom%E7%9A%84%E5%8E%9F%E5%9E%8B%E9%93%BE" tabindex="-1">5、DOM的原型链</h1>
+<p>document（XML）构造函数 -&gt; XMLDocument
+document（HTML）  构造函数 -&gt; HTMLDocument
+HTMLDocument 构造函数 -&gt; Document
+document.<strong>proto</strong>.<strong>proto</strong>=Document
+各变量的构造函数如图：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1615385719321-31c9d5bf-a370-419a-95e7-0e01e940b06c.png#crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;height=652&amp;id=KmuzJ&amp;margin=%5Bobject%20Object%5D&amp;name=QQ%E5%9B%BE%E7%89%8720210310221504.png&amp;originHeight=652&amp;originWidth=1160&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=829827&amp;status=done&amp;style=none&amp;title=&amp;width=1160" alt="QQ图片20210310221504.png">
+Dom结构树的顶层为Node。
+Document构造函数下有两个子类，分别为XMLDocument和HTMLDocument。Element构造函数同理。
+可以通过Object.prototype.toString.call()方法来判断节点类型。
+例：
+var div = document.getElementsByTagName('div')[0]
+console.log(Object.prototype.toString.call(div))
+console.log(Object.prototype.toString.call(div))//输出[object HTMLDivElement]</p>
+<h1 id="6%E3%80%81dom%E6%93%8D%E4%BD%9C%E6%B7%B1%E5%85%A5" tabindex="-1">6、DOM操作深入</h1>
+<h3 id="1%E3%80%81getelementbyid()%E3%80%81getelementsbyname()" tabindex="-1">1、getElementById()、getElementsByName()</h3>
+<p>只有Document的原型上有这两个方法，Element的原型上没有。</p>
+<h3 id="2%E3%80%81getelementbytagname()%E3%80%81getelementsbyclassname()%E3%80%81queryselector()%E3%80%81queryselectorall()" tabindex="-1">2、getElementByTagName()、getElementsByClassName()、querySelector()、querySelectorAll()</h3>
+<p>Document和Element两者的原型上都有这些方法。</p>
+<h3 id="3%E3%80%81*%E9%80%9A%E9%85%8D%E7%AC%A6" tabindex="-1">3、*通配符</h3>
+<p><em>通配符只能作用于getElementsByTagName('</em>')，会选择出所有标签。</p>
+<h3 id="4%E3%80%81document.body%E5%92%8Cdocument.head" tabindex="-1">4、document.body和document.head</h3>
+<p>两者可分别选出body和head元素，两属性在HTMLDocument的原型上。</p>
+<h3 id="5%E3%80%81document.title" tabindex="-1">5、document.title</h3>
+<p>返回title标签中的文本而不是整个title元素。</p>
+<h3 id="6%E3%80%81document.documentelement" tabindex="-1">6、document.documentElement</h3>
+<p>返回整个HTML文档，该属性在Document的原型上。</p>
+<h3 id="7%E3%80%81document.createdocumentfragment" tabindex="-1">7、document.createDocumentFragment</h3>
+<p>创建文档片段（碎片）
+在需要循环给文档添加多个节点时，浏览器渲染引擎需要多次重新去测算html的节点位置、几何数据（即回流），会大量消耗浏览器引擎的性能。所以可以通过创建文档片段来存储需要添加的若干个节点，再一次性添加到文档中，文档片段不会生成额外的节点。</p>
+<h1 id="7%E3%80%81%E5%88%9B%E5%BB%BA%E3%80%81%E6%B7%BB%E5%8A%A0%E5%92%8C%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9" tabindex="-1">7、创建、添加和删除节点</h1>
+<p>createElement()    该方法可以创建元素节点，为Document原型下的方法。
+createTextNode()    该方法可以创建文本节点，为Document原型下的方法。
+createComment()    该方法可以创建注释节点，为Document原型下的方法。
+appendChild()    该方法可以给节点增加子节点，排在所有子节点之后，为Node原型下的方法。该方法还可以剪切节点。
+insertBefore()    该方法可以在插入子节点，为Node原型下的方法。例：c.insertBefore(a, b)//在父节点c下的子节点b之前插入a节点
+removeChild()    该方法可以删除子节点，返回被删除的子节点（只是在文档中删除，该节点仍存在于内存中为被销毁，为Node原型下的方法。例：b.removeChild(a)//父节点b删除子节点a
+remove()    该方法可以使节点删除自身（不仅从文档中删除，也在内存中销毁）。
+replaceChild()    该方法可以替换节点。例： c.replaceChild(new, origin)//父节点下的origin节点被new节点替换</p>
+<h1 id="8%E3%80%81%E5%85%83%E7%B4%A0%E8%8A%82%E7%82%B9%E7%9A%84%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95" tabindex="-1">8、元素节点的属性和方法</h1>
+<p>innerHTML    节点的内容（包含标签），可读写属性，为Element原型下的属性。
+innerText    节点的内容（不包含标签），为HTMLElement原型下的属性。
+setAttribute    给节点设置属性。
+getAttribute    获取节点相应属性的值。
+扩展知识：HTML5给元素节点添加了一个新属性为data-*（自定义属性），可以通过.dataset来访问该属性集合
+例：&lt;p    data-name=&quot;wbk&quot;    data-age=&quot;21&quot;&gt;&lt;/p&gt;
+var  p = document.getElementsByTagName('p')[0]
+p.dataset//为一个对象集合，拥有name：wbk属性和age：21属性</p>
+<h1 id="9%E3%80%81%E6%BB%9A%E5%8A%A8%E8%B7%9D%E7%A6%BB%E4%B8%8E%E9%AB%98%E5%BA%A6" tabindex="-1">9、滚动距离与高度</h1>
+<h3 id="1%E3%80%81%E6%9F%A5%E7%9C%8B%E6%BB%9A%E5%8A%A8%E6%9D%A1%E8%B7%9D%E7%A6%BB%EF%BC%88%E7%BD%91%E9%A1%B5%E6%BB%9A%E5%8A%A8%E7%9A%84%E8%B7%9D%E7%A6%BB%EF%BC%89" tabindex="-1">1、查看滚动条距离（网页滚动的距离）</h3>
+<p>常规：window.pageXoffset和window.pageYoffset（IE9/IE8以下不支持）
+document.body.scrollLeft/scrollTop
+document.documentElement.scrollLeft/scrollTop（Chrome不支持）
+不常见：window.scrollX/scrollY
+兼容性问题：
+<img src="https://cdn.nlark.com/yuque/0/2021/png/12536926/1617012363515-c265f9cc-abc2-46c2-b0ab-3b1fc09c4dc5.png#crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;height=104&amp;id=tLLN5&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=208&amp;originWidth=750&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=161691&amp;status=done&amp;style=none&amp;title=&amp;width=375" alt="image.png"> 
+封装解决兼容性问题：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getScrollOffset</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">pageXOffset</span>) {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">left</span>: <span class="hljs-variable language_">window</span>.<span class="hljs-property">pageXOffset</span>,
+      <span class="hljs-attr">top</span>: <span class="hljs-variable language_">window</span>.<span class="hljs-property">pageYOffset</span>
+    }
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">left</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">scrollLeft</span> + <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">scrollLeft</span>,
+      <span class="hljs-attr">top</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">scrollTop</span> + <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">scrollTop</span>
+    }
+  }
+}
+</code></pre>
+<h3 id="2%E3%80%81%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%BA%E5%9F%9F%E7%9A%84%E5%B0%BA%E5%AF%B8%EF%BC%88%E7%AA%97%E5%8F%A3%E7%9A%84%E5%AE%BD%E9%AB%98%EF%BC%89" tabindex="-1">2、浏览器可视区域的尺寸（窗口的宽高）</h3>
+<p>常规：window.innerWidth/innerHeight
+document.documentElement.clientWidth/clientHeight（兼容IE9/IE8及以下，标准模式可用）
+document.body.clientWidth/clientHeight（兼容IE9/IE8及以下，怪异模式可用）
+扩展：window.outerWidth/outerHeight（包含浏览器工具栏等的窗口宽高）
+封装解决兼容性问题：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getViewPortSize</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">innerWidth</span>) {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">width</span>: <span class="hljs-variable language_">window</span>.<span class="hljs-property">innerWidth</span>,
+      <span class="hljs-attr">height</span>: <span class="hljs-variable language_">window</span>.<span class="hljs-property">innerHeight</span>
+    }
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">document</span>.<span class="hljs-property">compatMode</span> === <span class="hljs-string">&#x27;BackCompat&#x27;</span>) {
+      <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">width</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">clientWidth</span>,
+        <span class="hljs-attr">height</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">clientHeight</span>
+      }
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">width</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">clientWidth</span>,
+        <span class="hljs-attr">height</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">clientHeight</span>
+      }
+    }
+  }
+}
+</code></pre>
+<h3 id="3%E3%80%81%E9%A1%B5%E9%9D%A2%E5%8F%AF%E6%BB%9A%E5%8A%A8%E8%B7%9D%E7%A6%BB%E5%92%8C%E9%A1%B5%E9%9D%A2%E5%A4%A7%E5%B0%8F%E4%B9%8B%E5%92%8C" tabindex="-1">3、页面可滚动距离和页面大小之和</h3>
+<p>document.body.scrollWidth/scrollHeight
+document.documentElement.scrollWidth/scrollHeight
+封装解决兼容性问题：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getScorllSize</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">scrollWidth</span>) {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">width</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">scrollWidth</span>,
+      <span class="hljs-attr">height</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">scrollHeight</span>
+    }
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">width</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">scrollWidth</span>,
+      <span class="hljs-attr">height</span>: <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">scrollHeight</span>
+    }
+  }
+}
+</code></pre>
+<h3 id="4%E3%80%81%E8%8E%B7%E5%8F%96%E5%85%83%E7%B4%A0%E5%9C%A8%E6%96%87%E6%A1%A3%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E5%8F%8A%E5%A4%A7%E5%B0%8F%E7%AD%89%E5%B1%9E%E6%80%A7" tabindex="-1">4、获取元素在文档中的位置及大小等属性</h3>
+<p>getBoundingClientRect()    元素节点对象可调用，返回位置及大小各属性</p>
+<h3 id="5%E3%80%81%E5%85%83%E7%B4%A0%E8%8A%82%E7%82%B9%E5%9C%A8%E6%96%87%E6%A1%A3%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E5%81%8F%E7%A7%BB%E9%87%8F%E7%BB%86%E8%8A%82" tabindex="-1">5、元素节点在文档中的位置偏移量细节</h3>
+<p>元素节点对象使用offsetLeft/offsetTop属性时，获取的距离是基于该元素的定位而言的，如果该元素的父级定位元素存在，则距离值基于父级元素计算，否则一直找到body元素为止，可以使用offsetParent属性获得父级定位元素。
+封装方法以获得元素在窗口的位置：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getElemDocPosition</span>(<span class="hljs-params">el</span>) {
+  <span class="hljs-keyword">var</span> parent = el.<span class="hljs-property">offsetParent</span>,
+      offsetLeft = el.<span class="hljs-property">offsetLeft</span>,
+      offsetTop = el.<span class="hljs-property">offsetTop</span>
+
+  <span class="hljs-keyword">while</span> (parent) {
+    offsetLeft += parent.<span class="hljs-property">offsetLeft</span>
+    offsetTop += parent.<span class="hljs-property">offsetTop</span>
+    parent = parent.<span class="hljs-property">offsetParent</span>
+  }
+}
+</code></pre>
+<h3 id="6%E3%80%81%E6%93%8D%E4%BD%9C%E6%BB%9A%E5%8A%A8%E6%9D%A1" tabindex="-1">6、操作滚动条</h3>
+<p>window.scroll(x, y)/window.scrollTo(x, y)    可以使页面滚动到相应位置
+window.scrollBy(x, y)    可以使页面基于当前位置继续滚动该偏移量</p>
+<h1 id="10%E3%80%81%E9%BC%A0%E6%A0%87%E8%A1%8C%E4%B8%BA%E5%9D%90%E6%A0%87%E7%B3%BB" tabindex="-1">10、鼠标行为坐标系</h1>
+<p>clientX/Y    鼠标位置相当于当前可视区域的坐标（不包括滚动条的距离）
+layerX/Y    同pageX/Y相同（IE11以下同clientX/Y）
+screenX/Y    鼠标位置相对于屏幕的坐标
+X/Y    同clientX/Y相同（Firefox不支持）
+pageX/pageY    鼠标位置相对于当前文档的坐标（包括滚动条的距离）（IE9以下不支持）
+offsetX/Y    鼠标位置相对于块元素的坐标（包含边框，safari不包括边框）
+clientLeft/clientTop    文档偏移量（如浏览器中默认的margin： 8px/12px）
+封装解决pageX/Y的兼容性问题：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">pagePos</span>(<span class="hljs-params">e</span>) {
+  <span class="hljs-keyword">var</span> sLeft = <span class="hljs-title function_">getScrollOffset</span>().<span class="hljs-property">left</span>,
+      sTop = <span class="hljs-title function_">getScrollOffset</span>().<span class="hljs-property">top</span>,
+      cLeft = <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">clientLeft</span> || <span class="hljs-number">0</span>,
+      cTop = <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">clientTop</span> || <span class="hljs-number">0</span>
+  
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">X</span>: e.<span class="hljs-property">clientX</span> + sLeft - cLeft,
+    <span class="hljs-attr">Y</span>: e.<span class="hljs-property">clientY</span> + sTop - cTop
+  }
+}
+</code></pre>
+<h1 id="11%E3%80%81%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%80%AA%E5%BC%82%E6%A8%A1%E5%BC%8F%E5%92%8C%E6%A0%87%E5%87%86%E6%A8%A1%E5%BC%8F" tabindex="-1">11、浏览器的怪异模式和标准模式</h1>
+<p>浏览器有各自的兼容性模式，都是默认向后兼容的。
+使用document.compatMode可以获取到兼容模式。分为怪异模式（BackCompat）和标准模式（CSS1Compat）。怪异模式为浏览器自己定义的兼容规范，浏览器一般向后兼容五个版本。标准模式为W3C组织的兼容规范。在文档中加入&lt;!DOCTYPE  html&gt;则表示该文档需遵循W3C组织的兼容规范。</p>
+<h1 id="12%E3%80%81dom%E9%97%B4%E6%8E%A5%E6%93%8D%E4%BD%9Ccss" tabindex="-1">12、DOM间接操作CSS</h1>
+<p>DOM不能直接操作样式表，当改写style属性时，实际上是改写节点的style属性，改写后的style属性是行内样式。</p>
+<h3 id="1%E3%80%81%E6%93%8D%E4%BD%9C%E7%BB%86%E8%8A%82" tabindex="-1">1、操作细节</h3>
+<p>通过style属性改写的css属性是可读写的，style下的属性名因遵循小驼峰，且值必须为字符串，复合值需进行拆解赋值，如border属性，需拆解为borderWidth，borderStyle和borderColor。某些css属性在js中属于保留字，如float，需改写为cssFloat。</p>
+<h3 id="2%E3%80%81%E8%AE%BF%E9%97%AE%E8%8E%B7%E5%8F%96css%E5%B1%9E%E6%80%A7" tabindex="-1">2、访问获取css属性</h3>
+<p>1、通过style访问
+访问一个节点对象的style属性，会返回这个节点对象可设置的css属性值，各css属性值默认为空字符串。
+2、通过getComputedStyle()访问（查看计算样式）
+window.getComputedStyle（element，null）可以访问到element节点的css各属性的绝对值（如em单位换算为px单位）。IE8及以下不支持该方法，支持currentStyle属性。getComputedStyle()方法的第二个参数可以填伪元素的名称，就能获取到伪元素的css属性（只读），操作伪元素只能通过加上css的类。
+封装解决兼容性问题：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getStyles</span>(<span class="hljs-params">elem, prop</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">getComputedStyle</span>) {
+    <span class="hljs-keyword">if</span> (prop) {
+      <span class="hljs-keyword">return</span> <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">getComputedStyle</span>(elem, <span class="hljs-literal">null</span>)[prop]
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">getComputedStyle</span>(elem, <span class="hljs-literal">null</span>)
+    }
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">if</span> (prop) {
+      <span class="hljs-keyword">return</span> elem.<span class="hljs-property">currentStyle</span>[prop]
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> elem.<span class="hljs-property">currentStyle</span>
+    }
+  }    
+}
+</code></pre>
+
+</body>
+</html>
