@@ -6,11 +6,10 @@
     ]
   },
   "HTML": {
-    "sum": 4,
+    "sum": 3,
     "pages": [
       "Canvas基本API.html",
       "Canvas探究.html",
-      "DOM.html",
       "DOM事件.html"
     ]
   },

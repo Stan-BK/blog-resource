@@ -79,6 +79,6 @@ return test2
 }
 var test3 = test1() //此时执行了test1函数后，test1函数自身的作用域链回复到其定义时的作用域链，而test3保存  的是test2函数，test2函数的作用域链中包含test1函数的AO和GO
 test3（） //执行了test3函数后，test2函数自身的AO被销毁，但原来test1函数的AO依然在test2函数的作用域链中</p>
-
+<nav class="table-of-contents"><ol><li><a href="#1%E3%80%81%E6%9A%97%E7%A4%BA%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F">1、暗示全局变量</a></li><li><a href="#2%E3%80%81%E9%A2%84%E7%BC%96%E8%AF%91">2、预编译</a><ol><li><a href="#1%E3%80%81ao%EF%BC%88active-object%EF%BC%89">1、AO（active object）</a></li><li><a href="#2%E3%80%81go%EF%BC%88global-object%EF%BC%89">2、GO（global object）</a></li></ol></li><li><a href="#3%E3%80%81%E4%BD%9C%E7%94%A8%E5%9F%9F">3、作用域</a></li><li><a href="#4%E3%80%81%E9%97%AD%E5%8C%85">4、闭包</a></li></ol></nav>
 </body>
 </html>

@@ -30,7 +30,7 @@ async function generatePages(rootDir) {
   }
 }
 async function generatePage(dir, file, fileName) {
-  let res = md.render(file)
+  let res = md.render(file + '[TOC]')
   res = template.replace('{{}}', res)
   await fs.mkdir(resolvePath('../docs', dir), { recursive: true })
   return fs.writeFile(resolvePath('../docs', dir, fileName), res)
