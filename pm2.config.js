@@ -22,7 +22,7 @@ module.exports = {
        "repo" : "git@github.com:Stan-BK/blog-resource.git",
        "path" : "/www/blog/production",
        'pre-deploy': 'git fetch --all',
-       "post-deploy" : "npm install && npm run build && pm2 startOrRestart pm2.config.js --env production"
+       "post-deploy" : "npm install && pm2 startOrRestart pm2.config.js --env production"
     }
   }
 };
