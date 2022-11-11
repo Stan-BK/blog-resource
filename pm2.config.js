@@ -18,7 +18,7 @@ module.exports = {
     production : {
        "user" : "root",
        "host" : '120.78.190.140',
-       "ref"  : "origin/main",
+       "ref"  : "origin/master",
        "repo" : "git@github.com:Stan-BK/blog-resource.git",
        "path" : "/www/blog/production",
        'pre-deploy': 'git fetch --all',
