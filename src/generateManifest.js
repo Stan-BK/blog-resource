@@ -18,12 +18,12 @@ async function generateManifest() {
     pageInfo[dialogname]['pages'] = files.map(item => item.replace('.md', '.html'))
   }
 
-  for (const key of Object.keys(pageInfo)) {
-    if (!dialogCache.includes(key)) {
-      delete pageInfo[key]
-      await fs.rmdir(resolvePath('../docs', key), { recursive: true })
-    }
-  }
+  // for (const key of Object.keys(pageInfo)) {
+  //   if (!dialogCache.includes(key)) {
+  //     delete pageInfo[key]
+  //     await fs.rmdir(resolvePath('../docs', key), { recursive: true })
+  //   }
+  // }
   await fs.writeFile(resolvePath('../docs', 'manifest.json'), JSON.stringify(pageInfo, undefined, 2))
 }
 module.exports = generateManifest
