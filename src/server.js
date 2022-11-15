@@ -7,7 +7,7 @@ const app = new koa()
 
 app.use(async (ctx) => {
   const p = path.resolve(__dirname, '..' + ctx.url)
-  ctx.body = await new Promise((resolve, reject) => fs.readFile(p, 'utf-8', (err, data) => {
+  ctx.body = await new Promise((resolve, reject) => fs.readFile(decodeURI(p), 'utf-8', (err, data) => {
     if (err != null) reject(err)
     resolve(data)
   }))
