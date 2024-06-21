@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <h1 id="1.%E6%89%93%E5%8C%85%E7%9B%B8%E5%85%B3" tabindex="-1">1.打包相关</h1>
+<h2 id="%E6%89%93%E5%8C%85%E6%96%B9%E5%BC%8F" tabindex="-1">打包方式</h2>
+<p>打包方式（Bundle Mode）有三种：合并打包（Pack Together）、分离打包（Pack Separately）、标签打包（Pack Together By Label）。该配置存在于组的配置对象中。</p>
+<ul>
+<li>合并打包会将同组资源打包入同一bundle包。</li>
+<li>分离打包会将同组内每一资源单独打包为bundle。</li>
+<li>标签打包会将同组内同一标签组的资源打包入同一bundle包。</li>
+</ul>
+<blockquote>
+<h6 id="%E6%97%A0%E8%AE%BA%E9%80%89%E6%8B%A9%E5%93%AA%E7%A7%8D%E6%89%93%E5%8C%85%E6%96%B9%E5%BC%8F%EF%BC%8C%E5%9C%BA%E6%99%AF%EF%BC%88scene%EF%BC%89%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%B5%84%E6%BA%90%E9%83%BD%E4%BC%9A%E4%B8%8E%E5%85%B6%E4%BD%99%E8%B5%84%E6%BA%90%E5%88%86%E5%88%AB%E6%89%93%E5%8C%85%E3%80%82" tabindex="-1">无论选择哪种打包方式，场景（Scene）类型的资源都会与其余资源分别打包。</h6>
+</blockquote>
+<h2 id="%E6%89%93%E5%8C%85%E7%BB%86%E5%88%99" tabindex="-1">打包细则</h2>
+<p>不同打包方式的结果区分为大包小包，不同方式也伴随着各自的弊端：</p>
+<ol>
+<li>大包
+<ul>
+<li>大包的下载需要消耗更多带宽，意味着需要更长时间等待下载。</li>
+<li>UnityWebRequest 不会对下载失败的资源进行断点续传，一旦下载失败，则在网络复原后需要重新下载。</li>
+<li>包内的资源无法分别释放，即使对于大包仅持有最小依赖，也需要承受大包带来的大量内存占用。</li>
+</ul>
+</li>
+<li>小包
+<ul>
+<li>每个包体在加载入内存后，除了自身资源外，Unity还需要为其申请额外空间进行依赖树、缓存页面等的存储，打包为多个小包可能会增大相较于打包为大包的内存开销。</li>
+<li>下载捆绑包有并行限制，多个小包的下载容易达到限制，陷入排队等待下载的窘境。</li>
+<li>过多小包会增加Catalog表的体积，增加Unity在获取表内容时的等待时长。</li>
+<li>小包具有增加重复加载依赖的潜在性，对于两个引用同一未标识为Addressables素材资源的小包，会在加载时产生两份素材实例的开销。通过将两个小包合并或将素材标识为Addressables可以避免该问题。</li>
+</ul>
+</li>
+</ol>
+<h2 id="%E8%84%9A%E6%9C%AC%E7%9B%B8%E5%85%B3" tabindex="-1">脚本相关</h2>
+<p>Unity不允许直接将C#脚本标识为Addressables，这是为了避免造成依赖树臃肿以及代码泄露，可依据C#脚本为逻辑控制单元而非素材资源的性质进行理解。
+但在某些情况下C#脚本仍会被打包入bundle中，例如标记为 Addressables 的GameObject对象中引用的<code class="hljs"><span class="hljs-attribute">MonoScript</span></code>，或是标记为Addressables的场景中存在引用了 <code class="hljs"><span class="hljs-attribute">MonoScript</span></code> 的GameObject。
+该类通过隐式依赖而被打包的<code class="hljs"><span class="hljs-attribute">MonoScript</span></code>，可以通过 Addressables 配置文件的<code class="hljs"><span class="hljs-attribute">MonoScript Hundle Naming Prefix</span></code>进行是否分离打包以及包体命名的定制，通过将<code class="hljs"><span class="hljs-attribute">MonoScript</span></code>与素材资源文件进行分离打包，有利于提高构建内容更新的效率。</p>
+<nav class="table-of-contents"><ol><li><a href="#1.%E6%89%93%E5%8C%85%E7%9B%B8%E5%85%B3">1.打包相关</a><ol><li><a href="#%E6%89%93%E5%8C%85%E6%96%B9%E5%BC%8F">打包方式</a><ol><li><a href="#%E6%97%A0%E8%AE%BA%E9%80%89%E6%8B%A9%E5%93%AA%E7%A7%8D%E6%89%93%E5%8C%85%E6%96%B9%E5%BC%8F%EF%BC%8C%E5%9C%BA%E6%99%AF%EF%BC%88scene%EF%BC%89%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%B5%84%E6%BA%90%E9%83%BD%E4%BC%9A%E4%B8%8E%E5%85%B6%E4%BD%99%E8%B5%84%E6%BA%90%E5%88%86%E5%88%AB%E6%89%93%E5%8C%85%E3%80%82">无论选择哪种打包方式，场景（Scene）类型的资源都会与其余资源分别打包。</a></li></ol></li><li><a href="#%E6%89%93%E5%8C%85%E7%BB%86%E5%88%99">打包细则</a></li><li><a href="#%E8%84%9A%E6%9C%AC%E7%9B%B8%E5%85%B3">脚本相关</a></li></ol></li></ol></nav>
+</body>
+</html>

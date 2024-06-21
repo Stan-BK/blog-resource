@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <p>资源是项目中不可或缺的一部分，Unity为引入项目的资源提供了定制化的功能，旨在为项目带来更好、更恰当的画面表现，也为了针对对于运行时、编译时的性能调优。</p>
+<h1 id="%E5%B8%B8%E8%A7%81%E8%B5%84%E6%BA%90%E7%B1%BB%E5%9E%8B%E5%8F%8A%E4%BC%98%E5%8C%96%E6%89%8B%E6%AE%B5" tabindex="-1">常见资源类型及优化手段</h1>
+<p>常见的资源类型有：</p>
+<ul>
+<li>纹理（Texture）</li>
+<li>网格（Mesh）</li>
+<li>材质（Material）</li>
+<li>模型（Model）</li>
+<li>音频（Audio）</li>
+<li>视频（Video）</li>
+</ul>
+<p>以上资源都可以使用<code class="hljs">压缩（Compression）</code>手段进行内存优化。另外有针对不同资源类型的优化手段：</p>
+<ol>
+<li>纹理的优化
+<ul>
+<li>纹理的适配是常常考虑的场景，处于动态场景（指代移动镜头观察下）的物体纹理，通常需要开启Mipmaps以适应不同分辨率下的展示，而在静态场景下，或是忽略Z轴移动的场景，则可以关闭<code class="hljs">生成Mipmaps（<span class="hljs-keyword">Generate</span> Mipmaps）</code>的选项。另外在无需运行时改动纹理资源的场景下，可以关闭<code class="hljs"><span class="hljs-keyword">Read</span>/<span class="hljs-keyword">Write</span></code>选项以告知Unity，避免运行时生成两份副本（分别存储于CPU与GPU），生成副本的原因是减少从GPU读取纹理资源的开销。</li>
+</ul>
+</li>
+<li>网格的优化</li>
+</ol>
+<p>在无需运行时改动时关闭位于模型中<code class="hljs"><span class="hljs-attribute">Meshes</span></code>的<code class="hljs"><span class="hljs-keyword">Read</span>/<span class="hljs-keyword">Write</span></code>项，可以有效减少内存开销。
+在<code class="hljs"><span class="hljs-attribute">Mesh Renderer</span></code>中，阴影投射以及光照探针等选项是默认开启的，在非必要时关闭也可以减少开销。</p>
+<ol start="3">
+<li>模型的优化</li>
+</ol>
+<p>模型的优化囊括了网格的优化，除此之外还有操控架（英文名为Rig，应用于动画的角色框架）优化。无需动画表现时关闭Rig（于Rig菜单中设置Animation Type为None）可避免运行时自动生成动画组件计算的开销。
+在开启了Rig项并设置其类型为<code class="hljs"><span class="hljs-attribute">humanoid</span></code>时，可开启<code class="hljs"><span class="hljs-keyword">Optimize</span> Game Objects</code>选项以优化模型大小及烘培效率。</p>
+<ol start="4">
+<li>材质的优化</li>
+</ol>
+<p>材质可勾选<code class="hljs"><span class="hljs-attribute">GPU Instancing</span></code>以采用批处理手段优化Draw Call。</p>
+<h1 id="%E8%B5%84%E6%BA%90%E6%95%B4%E5%A4%87" tabindex="-1">资源整备</h1>
+<h2 id="%E8%B5%84%E6%BA%90%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B" tabindex="-1">资源工作流程</h2>
+<p><img src="https://cdn.nlark.com/yuque/0/2024/svg/12536926/1717661094830-5fcd274f-beef-4ac8-97b5-2f5c4791fe29.svg#clientId=u117d1d59-9f06-4&amp;from=paste&amp;height=407&amp;id=u736ed1e6&amp;originHeight=150&amp;originWidth=268&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;taskId=u5828a86c-9d68-4ab9-a0a5-6d0afcc1db9&amp;title=&amp;width=727" alt="">
+资源经由项目导入后，按项目规定的范式进行兼容，开发者可采取Unity内置的配置或自定义配置（AssetImporter）调整资源的表现形式，亦可通过脚本化控制、GUI配置管理等方式对资源的导入方式及流程进行控制；在构建阶段，资源会根据开发者指定形式进行归类打包，部分源构建环节可从项目构建环节分离开来（例如Addressables包管理配置为与程序分离打包）；最后依据不同资源包的不同性质，可采取各类发布以及分发手段提供给用户。</p>
+<h2 id="%E8%B5%84%E6%BA%90%E5%AF%BC%E5%85%A5%E9%A2%84%E5%A4%84%E7%90%86%2F%E5%90%8E%E5%A4%84%E7%90%86" tabindex="-1">资源导入预处理/后处理</h2>
+<p>Unity提供了<code class="hljs"><span class="hljs-attribute">AssetPostProcesser</span></code>对象来细度控制导入资源的流程环节。继承于<code class="hljs"><span class="hljs-attribute">AssetPostProcesser</span></code>的类可以调用不同类型资源的预处理接口以提前整备资源导入Unity后使用的各项属性。 <code class="hljs"><span class="hljs-attribute">AssetPostProcesser</span></code>支持资源的预处理以及后处理。
+相关接口由<code class="hljs">OnPreProcess/OnPostProcess + <span class="hljs-tag">&lt;<span class="hljs-name">AssetType</span>&gt;</span></code>定义，常用接口如下：</p>
+<ul>
+<li>OnPreprocessTexture</li>
+<li>OnPreprocessModel</li>
+<li>OnPreprocessAnimation</li>
+<li>OnPreprocessAudio</li>
+</ul>
+<p>通过逆变实例对象属性<code class="hljs"><span class="hljs-attribute">assetImporter</span></code>为<code class="hljs"><span class="hljs-attribute">ModelImporter</span></code>类型后，即可在接口中实现资源的属性定制：</p>
+<pre><code class="hljs language-csharp"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ReadOnlyModelPostprocessor</span> : <span class="hljs-title">AssetPostprocessor</span> {
+   <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">OnPreprocessModel</span>()</span> {
+        ModelImporter modelImporter = (ModelImporter)assetImporter;
+        <span class="hljs-keyword">if</span>(modelImporter.isReadable) {
+            modelImporter.isReadable = <span class="hljs-literal">false</span>;
+            modelImporter.SaveAndReimport();
+        }
+    }
+}
+</code></pre>
+<p>以上例子为导入的模型资源提前关闭 <code class="hljs"><span class="hljs-keyword">Read</span>/<span class="hljs-keyword">Write</span></code>选项。</p>
+<h2 id="%E8%B5%84%E6%BA%90%E5%B9%B6%E8%A1%8C%E5%AF%BC%E5%85%A5" tabindex="-1">资源并行导入</h2>
+<p>开启资源的并行导入，可以在批量导入资源时优化导入效率。更可设置同时处理导入的工作线程数以及最低期望工作线程数，降低<code class="hljs">Idle Import Worker Shutdown <span class="hljs-keyword">Delay</span>（工作线程等待关闭时延）</code>的时长可以加快切换加载工作线程的速度。
+<img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1717662115003-4d4b888a-aa4f-45c4-9828-7d5f7d2fde39.png#averageHue=%233a3838&amp;clientId=u117d1d59-9f06-4&amp;from=paste&amp;id=uadab4861&amp;originHeight=136&amp;originWidth=590&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;taskId=u18b52082-44d0-4cf0-a486-9bc473545eb&amp;title=" alt=""></p>
+<h2 id="%E9%85%8D%E7%BD%AE%E8%B5%84%E6%BA%90%E5%AF%BC%E5%85%A5%E5%99%A8" tabindex="-1">配置资源导入器</h2>
+<p>Unity除了提供的内置导入器外，还支持开发者自定义资源导入器以分析Unity资源分析名单外的资源文件。该自定义资源导入器由<code class="hljs"><span class="hljs-attribute">ScriptedImporter</span></code>类支持，<code class="hljs"><span class="hljs-attribute">ScriptedImporter</span></code>类与Unity内置导入器一样，继承于<code class="hljs"><span class="hljs-attribute">AssetImporter</span></code>类。开发者可借助<code class="hljs"><span class="hljs-attribute">ScriptedImporter</span></code>特性分析资源后缀，对特性定义的后缀文件进行导入监听，由<code class="hljs"><span class="hljs-attribute">ScriptedImporter</span></code>类下的<code class="hljs"><span class="hljs-attribute">OnImportAsset</span></code>方法获取到资源上下文，围绕资源进行Unity资产构建。</p>
+<pre><code class="hljs language-csharp"><span class="hljs-keyword">using</span> UnityEngine;
+<span class="hljs-keyword">using</span> UnityEditor.AssetImporters;
+<span class="hljs-keyword">using</span> System.IO;
+
+[<span class="hljs-meta">ScriptedImporter(1, <span class="hljs-string">&quot;cube&quot;</span>)</span>]
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CubeImporter</span> : <span class="hljs-title">ScriptedImporter</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-built_in">float</span> m_Scale = <span class="hljs-number">1</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">void</span> <span class="hljs-title">OnImportAsset</span>(<span class="hljs-params">AssetImportContext ctx</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        <span class="hljs-keyword">var</span> position = JsonUtility.FromJson&lt;Vector3&gt;(File.ReadAllText(ctx.assetPath));
+
+        cube.transform.position = position;
+        cube.transform.localScale = <span class="hljs-keyword">new</span> Vector3(m_Scale, m_Scale, m_Scale);
+
+        <span class="hljs-comment">// &#x27;cube&#x27; 是一个游戏对象，会自动转换为预制件</span>
+        <span class="hljs-comment">//（只有 &#x27;Main Asset&#x27; 才能成为预制件。）</span>
+        ctx.AddObjectToAsset(<span class="hljs-string">&quot;main obj&quot;</span>, cube);
+        ctx.SetMainObject(cube);
+
+        <span class="hljs-keyword">var</span> material = <span class="hljs-keyword">new</span> Material(Shader.Find(<span class="hljs-string">&quot;Standard&quot;</span>));
+        material.color = Color.red;
+
+        <span class="hljs-comment">// 资源必须为资源分配一个唯一标识符字符串，且在所有导入之间保持一致</span>
+        ctx.AddObjectToAsset(<span class="hljs-string">&quot;my Material&quot;</span>, material);
+
+        <span class="hljs-comment">// 必须销毁未作为导入输出传入上下文的资源</span>
+        <span class="hljs-keyword">var</span> tempMesh = <span class="hljs-keyword">new</span> Mesh();
+        DestroyImmediate(tempMesh);
+    }
+}
+</code></pre>
+<h1 id="%E5%85%B6%E4%BB%96%E7%BB%86%E8%8A%82" tabindex="-1">其他细节</h1>
+<h2 id="%E4%BC%98%E5%8C%96%E7%BB%86%E8%8A%82" tabindex="-1">优化细节</h2>
+<ul>
+<li>对于<code class="hljs"><span class="hljs-type">String</span></code>类型的变量进行改动，性能开销和内存开销会因为<code class="hljs"><span class="hljs-type">String</span></code>类型每次更新需要alloc新的内存空间而增大，在需要频繁更改的场景下，使用<code class="hljs"><span class="hljs-attribute">StringBuilder</span></code>类型效果更佳。</li>
+<li>函数的调用是涉及到上下文切换、内存开辟等环节，无论函数内部实际执行语句量多少，以上环节都是必要的开销。所有因尽量避免多余的函数调用。</li>
+<li><code class="hljs"><span class="hljs-attribute">Vector</span></code>、<code class="hljs"><span class="hljs-attribute">Quaternion</span></code>类型计算的开销会比数值类计算的开销更大，在多种数值类型进行交互计算时，考虑交换律以优化计算的顺序，减少计算开销：</li>
+</ul>
+<pre><code class="hljs language-csharp">Vector3 x;
+
+<span class="hljs-built_in">int</span> a, b;
+
+<span class="hljs-comment">// 效率较低：产生两次矢量乘法</span>
+
+Vector3 slow = a * x * b;
+
+<span class="hljs-comment">// 效率较高：一次整数乘法、一次矢量乘法</span>
+
+Vector3 fast = a * b * x;
+</code></pre>
+<nav class="table-of-contents"><ol><li><a href="#%E5%B8%B8%E8%A7%81%E8%B5%84%E6%BA%90%E7%B1%BB%E5%9E%8B%E5%8F%8A%E4%BC%98%E5%8C%96%E6%89%8B%E6%AE%B5">常见资源类型及优化手段</a></li><li><a href="#%E8%B5%84%E6%BA%90%E6%95%B4%E5%A4%87">资源整备</a><ol><li><a href="#%E8%B5%84%E6%BA%90%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B">资源工作流程</a></li><li><a href="#%E8%B5%84%E6%BA%90%E5%AF%BC%E5%85%A5%E9%A2%84%E5%A4%84%E7%90%86%2F%E5%90%8E%E5%A4%84%E7%90%86">资源导入预处理/后处理</a></li><li><a href="#%E8%B5%84%E6%BA%90%E5%B9%B6%E8%A1%8C%E5%AF%BC%E5%85%A5">资源并行导入</a></li><li><a href="#%E9%85%8D%E7%BD%AE%E8%B5%84%E6%BA%90%E5%AF%BC%E5%85%A5%E5%99%A8">配置资源导入器</a></li></ol></li><li><a href="#%E5%85%B6%E4%BB%96%E7%BB%86%E8%8A%82">其他细节</a><ol><li><a href="#%E4%BC%98%E5%8C%96%E7%BB%86%E8%8A%82">优化细节</a></li></ol></li></ol></nav>
+</body>
+</html>

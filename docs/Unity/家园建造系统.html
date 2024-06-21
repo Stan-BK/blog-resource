@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: "Gill Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://source.geminikspace.com/blog/common.css">
+  <link rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+</head>
+<body>
+  <h1 id="%E5%A4%A7%E7%BA%B2" tabindex="-1">大纲</h1>
+<p>家园建造系统，设计组成由编辑器配置模块、玩家交互模块、模型整备模块构成，对应开发需求为三部分：实现编辑器内配置表，需支持每套建筑的预制体绑定设计、配置导出；实现玩家游戏内交互，需呈现建筑展示、放置预览、整体预览效果；实现放置检测，位置导出等模型相关功能；</p>
+<h1 id="%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1" tabindex="-1">模块设计</h1>
+<p><img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1712375616644-710b1e58-332c-48f9-ac95-16bbc986663d.png#averageHue=%23f8f8f8&amp;clientId=u72189e12-29f7-4&amp;from=paste&amp;height=813&amp;id=ua06f7aea&amp;originHeight=813&amp;originWidth=1955&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=194282&amp;status=done&amp;style=none&amp;taskId=u4f021a04-bc17-4b4c-a1b8-6ef767c1165&amp;title=&amp;width=1955" alt="image.png"></p>
+<h1 id="%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0" tabindex="-1">具体实现</h1>
+<h2 id="%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B" tabindex="-1">数据模型</h2>
+<p>定义Building类型，其作为前后端通用类型，兼容套装配置表与玩家地图内配置表，其声明如下：
+<img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1712150576943-425ec57a-c65c-4bff-9148-24da49cfa08f.png#averageHue=%231f1f1f&amp;clientId=u37febcbd-dbf6-4&amp;from=paste&amp;height=370&amp;id=u46a3841b&amp;originHeight=757&amp;originWidth=769&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=96331&amp;status=done&amp;style=none&amp;taskId=u24f1eca6-f217-4749-bd2f-77730e2569d&amp;title=&amp;width=376" alt="image.png">
+作为套装配置表存在时，可忽略位置及旋转信息，且基于该类型扩展为ScriptableObject对象（详情见3.2）。</p>
+<h2 id="%E7%BC%96%E8%BE%91%E5%99%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0" tabindex="-1">编辑器配置实现</h2>
+<p><strong><em>效果图</em></strong>
+<img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1712066073026-93c3ab1d-6362-4573-96d9-9147dbfed190.png#averageHue=%233c3c3c&amp;clientId=udbfb1df3-7b80-4&amp;from=paste&amp;height=714&amp;id=uafb37d91&amp;originHeight=714&amp;originWidth=553&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=39816&amp;status=done&amp;style=none&amp;taskId=uc8e3b3c5-f027-40b2-bd6c-e82c4aa14cc&amp;title=&amp;width=553" alt="image.png">
+<em><strong>思路</strong></em>
+考虑到游戏内可能存在多套主题场景资源的定制，使用ScriptableObject作为数据容器，并通过UI Toolkit为该数据容器定制Inspector窗口，将模块需求展示于前端，方便配置。该配置器的SO对象为BuildingsManifestSO，作为Building类型的扩展，其新增了配置名称以及对于IO管理的方法。
+该数据容器包含内容为主题场景的模型资源，可指定提供的模型对象及提供的模型数量，支持从当前场景读取模型资源（资源需为预制体）。</p>
+<h2 id="%E4%BB%A3%E7%A0%81%E5%B1%82%E5%AE%9E%E7%8E%B0" tabindex="-1">代码层实现</h2>
+<p><strong>PlayerModelManager：<strong>作为模块的启动入口以及功能触发器，适合作为单例存在，其下管理着玩家的行为调度、存取各Manifest的配置。
+<strong>PlaceController：<strong>在</strong>PlayerModelManger</strong>经由玩家配置表的初始化后进行调度，负责在场景中生成还原玩家配置表的建筑实体，并为每个实体对象绑定</strong>TransformController</strong>和<strong>Detect Controller</strong>。
+**TransformController：**支持玩家控制当前选择放置的建筑的位移及偏转。
+**DetectController：**在玩家选择放置后，触发的位置合法性检测。
+**缓存池：**对于玩家取消放置的GameObject进行分类缓存，再次选择放置同类型时进行取用，避免重新生成建筑对象的性能消耗。</p>
+<h1 id="%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B" tabindex="-1">使用流程</h1>
+<h2 id="%E8%AE%BE%E8%AE%A1%E6%95%B4%E5%A4%87%E8%B5%84%E6%BA%90" tabindex="-1">设计整备资源</h2>
+<p>设计整备每一套资源，可将预制体置入场景中，一键生成配置表，或自行拖拽进行配置。
+<img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1712376153259-0cc07bc4-6477-415a-b15c-91bbed7dec71.png#averageHue=%2362594f&amp;clientId=u72189e12-29f7-4&amp;from=paste&amp;height=962&amp;id=u630638f2&amp;originHeight=962&amp;originWidth=2549&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=925879&amp;status=done&amp;style=none&amp;taskId=udd67133d-c8e2-445f-8238-95783bd47e0&amp;title=&amp;width=2549" alt="image.png">
+生成内容如下：
+<img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1712376501874-38197b0d-782c-4588-902e-210084120e48.png#averageHue=%2362594f&amp;clientId=u72189e12-29f7-4&amp;from=paste&amp;height=729&amp;id=u7ae2781c&amp;originHeight=729&amp;originWidth=1733&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=551203&amp;status=done&amp;style=none&amp;taskId=ud7775018-ba82-4081-9a6a-a2927ca0a23&amp;title=&amp;width=1733" alt="image.png">
+导入/导出配置选项，将配置资源导出为Json格式文本，方便传输转换。</p>
+<h2 id="%E7%8E%A9%E5%AE%B6%E5%AF%BC%E5%85%A5%E8%B5%84%E6%BA%90" tabindex="-1">玩家导入资源</h2>
+<p>玩家将于数据端导入套装资源，数据表根据Building模型设计，拥有定位、旋转等放置记录，实现放置保存。</p>
+<h2 id="%E7%8E%A9%E5%AE%B6%E6%94%BE%E7%BD%AE%E8%B5%84%E6%BA%90" tabindex="-1">玩家放置资源</h2>
+<p>图片展示：
+<img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1712389601214-8d701294-cc5d-4ea1-a703-02c940cac027.png#averageHue=%23a3b669&amp;clientId=u72189e12-29f7-4&amp;from=paste&amp;height=1189&amp;id=u26d0a85c&amp;originHeight=1189&amp;originWidth=1796&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=4945030&amp;status=done&amp;style=none&amp;taskId=u5ad74cda-3d04-4d8a-b36d-ea3ad9e5b74&amp;title=&amp;width=1796" alt="image.png">
+<img src="https://cdn.nlark.com/yuque/0/2024/png/12536926/1712389689136-70bf139e-88c7-4423-8979-99d320f220ce.png#averageHue=%23adbab4&amp;clientId=u72189e12-29f7-4&amp;from=paste&amp;height=1108&amp;id=udbf901cc&amp;originHeight=1108&amp;originWidth=1301&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=3217160&amp;status=done&amp;style=none&amp;taskId=u3a088f06-2cc7-4ce4-9851-0246b642ccc&amp;title=&amp;width=1301" alt="image.png">
+Demo展示：
+<a href="https://github.com/Stan-BK/BuildingDemo">https://github.com/Stan-BK/BuildingDemo</a></p>
+<nav class="table-of-contents"><ol><li><a href="#%E5%A4%A7%E7%BA%B2">大纲</a></li><li><a href="#%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1">模块设计</a></li><li><a href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0">具体实现</a><ol><li><a href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B">数据模型</a></li><li><a href="#%E7%BC%96%E8%BE%91%E5%99%A8%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0">编辑器配置实现</a></li><li><a href="#%E4%BB%A3%E7%A0%81%E5%B1%82%E5%AE%9E%E7%8E%B0">代码层实现</a></li></ol></li><li><a href="#%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B">使用流程</a><ol><li><a href="#%E8%AE%BE%E8%AE%A1%E6%95%B4%E5%A4%87%E8%B5%84%E6%BA%90">设计整备资源</a></li><li><a href="#%E7%8E%A9%E5%AE%B6%E5%AF%BC%E5%85%A5%E8%B5%84%E6%BA%90">玩家导入资源</a></li><li><a href="#%E7%8E%A9%E5%AE%B6%E6%94%BE%E7%BD%AE%E8%B5%84%E6%BA%90">玩家放置资源</a></li></ol></li></ol></nav>
+</body>
+</html>
